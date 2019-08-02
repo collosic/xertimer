@@ -1,14 +1,11 @@
-import React from 'react';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-
+import React, { useState } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import Hidden from '@material-ui/core/Hidden';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import AuthDialog from '../dialogs/AuthDialog';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -18,44 +15,23 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     flexGrow: '1',
   },
-  center: {},
   button: {
     margin: theme.spacing(1),
     width: '200px',
   },
-  extendedIcon: {
-    marginRight: theme.spacing(1),
-  },
 }));
 
-// Configure Firebase.
-const config = {
-  apiKey: process.env.REACT_APP_API_KEY,
-  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_DATABASE_URL,
-  projectId: process.env.REACT_APP_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
-};
-firebase.initializeApp(config);
-
-console.log(firebase.auth());
-console.log(firebase.database().ref('users'));
-
-// Configure FirebaseUI.
-const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: 'popup',
-  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
-  callbacks: {
-    signInSuccess: () => false,
-  },
-};
-
 const Welcome = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const classes = useStyles();
+
+  const openAuthDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const closeAuthDialog = () => {
+    setIsDialogOpen(false);
+  };
 
   return (
     <React.Fragment>
@@ -69,9 +45,25 @@ const Welcome = () => {
           lengths for each set. It also allows to make manual sets in the cases where you are doing
           set number of reps instead of a timed set.
         </Typography>
-        <Button variant="contained" color="primary" size="large" className={classes.button}>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          className={classes.button}
+          onClick={openAuthDialog}
+        >
           <Typography variant="button">Get Started</Typography>
         </Button>
+        {isDialogOpen && (
+          <React.Fragment>
+            <Hidden only="xs">
+              <AuthDialog onClose={closeAuthDialog} />
+            </Hidden>
+            <Hidden only={['sm', 'md', 'lg', 'xl']}>
+              <AuthDialog fullScreen onClose={closeAuthDialog} />
+            </Hidden>
+          </React.Fragment>
+        )}
       </Container>
     </React.Fragment>
   );

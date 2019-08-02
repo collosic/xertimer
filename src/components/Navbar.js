@@ -1,9 +1,11 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import firebase from './Firebase';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,8 +19,14 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const NavBar = () => {
+const NavBar = (props) => {
   const classes = useStyles();
+  const { currentUser } = firebase.auth;
+
+  async function signOutUser() {
+    await firebase.logout();
+    props.history.replace('/');
+  }
 
   return (
     <div className={classes.root}>
@@ -27,11 +35,15 @@ const NavBar = () => {
           <Typography variant="h6" className={classes.title}>
             Xertimer
           </Typography>
-          <Button color="inherit">Login</Button>
+          {currentUser && currentUser.uid && (
+            <Button color="inherit" onClick={signOutUser}>
+              Sign Out
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </div>
   );
 };
 
-export default NavBar;
+export default withRouter(NavBar);
