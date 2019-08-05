@@ -12,14 +12,19 @@ import validate from 'validate.js';
 import firebase from '../components/Firebase';
 import constraints from '../constraints';
 
+import Spinner from '../components/Spinner';
+
 const ResetPassword = ({ onClose }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [emailAddress, setEmailAddress] = useState('');
   const [errors, setErrors] = useState(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   function handleResetPassClose() {
-    setOpen(false);
-    onClose();
+    if (!isSendingEmail) {
+      setOpen(false);
+      onClose();
+    }
   }
 
   const handleChange = (e) => {
@@ -28,6 +33,7 @@ const ResetPassword = ({ onClose }) => {
   };
 
   const resetPasswordEmail = async () => {
+    setIsSendingEmail(true);
     const errs = validate(
       {
         emailAddress,
@@ -42,15 +48,14 @@ const ResetPassword = ({ onClose }) => {
     } else {
       setErrors(null);
       try {
-        const results = await firebase.resetPasswordEmail(emailAddress);
-        console.log(results);
-        debugger;
+        await firebase.resetPasswordEmail(emailAddress);
+        setIsSendingEmail(false);
+        handleResetPassClose();
       } catch (error) {
-        console.log(error);
-        debugger;
         if (error.code === 'auth/user-not-found') {
           setErrors({ emailAddress: [error.message] });
         }
+        setIsSendingEmail(false);
       }
     }
   };
@@ -85,6 +90,7 @@ const ResetPassword = ({ onClose }) => {
             Send Email
           </Button>
         </DialogActions>
+        {isSendingEmail && <Spinner />}
       </Dialog>
     </div>
   );

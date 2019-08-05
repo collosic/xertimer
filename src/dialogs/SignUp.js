@@ -19,6 +19,8 @@ import constraints from '../constraints';
 
 import firebase from '../components/Firebase';
 
+import Spinner from '../components/Spinner';
+
 const useStyles = makeStyles(theme => ({
   outerContainer: {
     height: '550px',
@@ -105,6 +107,7 @@ const SignUp = (props) => {
 
   const signUp = () => {
     setIsAuthenticating(true);
+    props.onAuthenticating(true);
     const errs = validate(
       {
         firstName: values.name,
@@ -259,6 +262,7 @@ const SignUp = (props) => {
           </Button>
         </DialogActions>
       </div>
+      {isAuthenticating && <Spinner />}
     </div>
   );
 };
