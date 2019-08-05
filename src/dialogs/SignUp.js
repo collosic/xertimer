@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import Icon from '@material-ui/core/Icon';
-import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -16,11 +14,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import validate from 'validate.js';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Typography } from '@material-ui/core';
-import FacebookBoxIcon from 'mdi-material-ui/FacebookBox';
-import GoogleIcon from 'mdi-material-ui/Google';
 import constraints from '../constraints';
 
 import firebase from '../components/Firebase';
@@ -48,9 +42,7 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(0),
   },
   title: {},
-  content: {
-    flex: '0 0 auto',
-  },
+  content: {},
   dialogActions: {
     width: '100%',
     display: 'flex',
@@ -61,10 +53,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     justifyContent: 'space-evenly',
   },
-  inputFields: {
-    width: '100%',
-    margin: '16px 0 8px 0',
-  },
+  inputFields: { height: '48px' },
   dialogText: {
     textAlign: 'center',
     marginBottom: '0',
@@ -87,6 +76,7 @@ const useStyles = makeStyles(theme => ({
 const SignUp = (props) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [values, setValues] = useState({
+    name: '',
     emailAddress: '',
     password: '',
     passwordConfirmation: '',
@@ -96,12 +86,32 @@ const SignUp = (props) => {
 
   const [errors, setErrors] = useState(null);
 
+  const generateUserData = () => ({
+    user: {
+      email: values.emailAddress,
+      emailVerified: false,
+    },
+    additionalUserInfo: {
+      profile: {
+        given_name: values.name,
+      },
+      isNewUser: true,
+    },
+  });
+
   async function createNewAccount({ emailAddress, password }) {
     try {
       await firebase.createAccount(emailAddress, password);
-      await firebase.addUserAccount();
+      await firebase.addUserAccount(generateUserData());
+      props.history.replace('/xertimer');
     } catch (error) {
-      // TODO: error out when email account is already in use
+      if (error.code === 'auth/email-already-in-use') {
+        setErrors({ emailAddress: [error.message] });
+      } else if (error.code === 'auth/user-not-found') {
+        setErrors({ emailAddress: ['User not found'] });
+      } else {
+        setErrors({ emailAddress: [error.message] });
+      }
       console.log(error.message);
     } finally {
       setIsAuthenticating(false);
@@ -109,13 +119,16 @@ const SignUp = (props) => {
   }
 
   const signUp = () => {
+    setIsAuthenticating(true);
     const errs = validate(
       {
+        firstName: values.name,
         emailAddress: values.emailAddress,
         password: values.password,
         passwordConfirmation: values.passwordConfirmation,
       },
       {
+        firstName: constraints.firstName,
         emailAddress: constraints.emailAddress,
         password: constraints.password,
         passwordConfirmation: constraints.passwordConfirmation,
@@ -152,6 +165,17 @@ const SignUp = (props) => {
           <DialogContent className={classes.content}>
             <form>
               <TextField
+                autoComplete="name"
+                error={!!(errors && errors.name)}
+                fullWidth
+                helperText={errors && errors.name ? errors.name[0] : ''}
+                label="Name"
+                margin="normal"
+                onChange={handleChange('name')}
+                type="email"
+                value={values.name}
+              />
+              <TextField
                 autoComplete="email"
                 error={!!(errors && errors.emailAddress)}
                 fullWidth
@@ -162,7 +186,12 @@ const SignUp = (props) => {
                 type="email"
                 value={values.emailAddress}
               />
-              <FormControl className={classes.inputFields} error={!!(errors && errors.password)}>
+              <FormControl
+                margin="normal"
+                fullWidth
+                className={classes.inputFields}
+                error={!!(errors && errors.password)}
+              >
                 <InputLabel htmlFor="adornment-password">Password</InputLabel>
                 <Input
                   id="adornment-password"
@@ -186,6 +215,8 @@ const SignUp = (props) => {
                 </FormHelperText>
               </FormControl>
               <FormControl
+                fullWidth
+                margin="normal"
                 className={classes.inputFields}
                 error={!!(errors && errors.passwordConfirmation)}
               >
@@ -217,7 +248,8 @@ const SignUp = (props) => {
             <Button
               className={classes.button}
               disabled={
-                !values.emailAddress
+                !values.name
+                || !values.emailAddress
                 || !values.password
                 || !values.passwordConfirmation
                 || isAuthenticating
@@ -225,61 +257,11 @@ const SignUp = (props) => {
               variant="contained"
               color="primary"
               fullWidth
-              onClick={signUp}
+              onClick={() => signUp()}
             >
               Login
             </Button>
           </DialogActions>
-
-          <DialogContent className={classes.content}>
-            <DialogContentText className={classes.dialogText}>
-              <Typography variant="caption">Use social logins</Typography>
-            </DialogContentText>
-            <DialogActions className={classes.socialIcons}>
-              <Tooltip title="Facebook">
-                <IconButton
-                  className={classes.button}
-                  aria-label="delete"
-                  disabled={
-                    !values.emailAddress
-                    || !values.password
-                    || !values.passwordConfirmation
-                    || isAuthenticating
-                  }
-                >
-                  <FacebookBoxIcon className={classes.facebookIcon} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Google">
-                <IconButton
-                  className={classes.button}
-                  color="primary"
-                  disabled={
-                    !values.emailAddress
-                    || !values.password
-                    || !values.passwordConfirmation
-                    || isAuthenticating
-                  }
-                >
-                  <GoogleIcon className={classes.googleIcon} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Guest Login">
-                <IconButton
-                  className={classes.button}
-                  aria-label="add an alarm"
-                  disabled={
-                    !values.emailAddress
-                    || !values.password
-                    || !values.passwordConfirmation
-                    || isAuthenticating
-                  }
-                >
-                  <Icon>account_box</Icon>
-                </IconButton>
-              </Tooltip>
-            </DialogActions>
-          </DialogContent>
         </div>
         <DialogActions className={classes.createAccountParent}>
           <Button
@@ -288,7 +270,7 @@ const SignUp = (props) => {
             className={classes.margin}
             onClick={props.changeDialog}
           >
-            Sign In
+            Trying to Sign In?
           </Button>
         </DialogActions>
       </div>

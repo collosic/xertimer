@@ -50,7 +50,7 @@ const Welcome = () => {
           color="primary"
           size="large"
           className={classes.button}
-          onClick={openAuthDialog}
+          onClick={() => openAuthDialog()}
         >
           <Typography variant="button">Get Started</Typography>
         </Button>

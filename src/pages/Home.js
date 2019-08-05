@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import firebase from '../components/Firebase';
 import Layout from '../components/Layout';
@@ -14,26 +14,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Home = () => {
-  const [appStatus, setAppStatus] = useState({
-    isSignedIn: false,
-    isSignUpDialogOpen: false,
-    isSignInDialogOpen: false,
-  });
-
-  // Check and see if a user is currently signed in
-  const { currentUser } = firebase.auth;
-
-  if (currentUser && currentUser.uid) {
-    setAppStatus({ ...appStatus, isSignedIn: true });
-  }
-
   const classes = useStyles();
 
   return (
     <div className={classes.container}>
       <Layout />
-      {!appStatus.isSignedIn && <Welcome />}
-      {appStatus.isSignedIn && <Xertimer />}
+      <Welcome />
     </div>
   );
 };

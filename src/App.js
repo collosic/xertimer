@@ -15,7 +15,7 @@ export default function App() {
     firebase.isInitialized().then((val) => {
       setFirebaseInitialized(val);
     });
-  });
+  }, []);
 
   return firebaseInitialized !== false ? (
     <MuiThemeProvider theme={theme}>

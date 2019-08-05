@@ -15,9 +15,9 @@ const config = {
 class Firebase {
   constructor() {
     firebase.initializeApp(config);
+    this.firebase = firebase;
     this.auth = firebase.auth();
     this.db = firebase.firestore();
-    console.log(this.auth.currentUser);
   }
 
   login(email, password) {
@@ -29,24 +29,39 @@ class Firebase {
   }
 
   async createAccount(email, password) {
-    await this.auth.createUserWithEmailAndPassword(email, password);
-    return this.auth.currentUser.updateProfile({
-      userName: email,
-    });
+    return this.auth.createUserWithEmailAndPassword(email, password);
   }
 
   async signInWithProvider(provider) {
-    await this.auth.signInWithProvider(provider);
+    return this.auth.signInWithPopup(provider);
   }
 
-  addUserAccount() {
-    if (!this.auth.currentUser) {
-      console.log('error');
-    }
+  async signInAnonymously() {
+    return this.auth.signInAnonymously();
+  }
 
-    return this.db.doc(`users/${this.auth.currentUser.uid}`).set({
-      uid: this.auth.currentUser.uid,
-      name: 'test',
+  getCurrentUser() {
+    return this.isInitialized();
+  }
+
+  getGoogleProvider() {
+    const newProvider = new this.firebase.auth.GoogleAuthProvider();
+    return newProvider;
+  }
+
+  addUserAccount(userData) {
+    if (!this.auth.currentUser) {
+      console.log('User not currently logged int');
+      return null;
+    }
+    const { uid } = this.auth.currentUser;
+
+    return this.db.doc(`users/${uid}`).set({
+      uid,
+      firstName: userData.additionalUserInfo.profile.given_name,
+      email: userData.user.email,
+      emailVerified: userData.user.emailVerified,
+      isNewUser: userData.additionalUserInfo.isNewUser,
     });
   }
 

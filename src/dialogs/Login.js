@@ -91,7 +91,6 @@ const Login = (props) => {
     password: '',
     showPassword: false,
   });
-
   const [errors, setErrors] = useState(null);
 
   const signIn = () => {
@@ -108,8 +107,6 @@ const Login = (props) => {
         } else {
           setErrors({ emailAddress: [error.message] });
         }
-      } finally {
-        setIsAuthenticating(false);
       }
     }
 
@@ -129,6 +126,28 @@ const Login = (props) => {
     } else {
       setErrors(null);
       signInUser(values);
+    }
+  };
+
+  async function signInWithProvider(provider) {
+    setIsAuthenticating(true);
+    try {
+      const results = await firebase.signInWithProvider(provider);
+      await firebase.addUserAccount(results);
+      props.history.replace('/Xertimer');
+    } catch (error) {
+      // TODO: error out when email account is already in use
+      console.log(error.message);
+    }
+  }
+
+  const signInAnonymously = async () => {
+    setIsAuthenticating(true);
+    try {
+      const results = await firebase.signInAnonymously();
+      props.history.replace('/Xertimer');
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -196,7 +215,7 @@ const Login = (props) => {
               variant="contained"
               color="primary"
               fullWidth
-              onClick={signIn}
+              onClick={() => signIn()}
             >
               Login
             </Button>
@@ -204,7 +223,7 @@ const Login = (props) => {
 
           <DialogContent className={classes.content}>
             <DialogContentText className={classes.dialogText}>
-              <Typography variant="caption">Use social logins</Typography>
+              <Typography variant="caption">Or use the following</Typography>
             </DialogContentText>
             <DialogActions className={classes.socialIcons}>
               <Tooltip title="Facebook">
@@ -217,7 +236,12 @@ const Login = (props) => {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Google">
-                <IconButton className={classes.button} color="primary" disabled={isAuthenticating}>
+                <IconButton
+                  className={classes.button}
+                  color="primary"
+                  disabled={isAuthenticating}
+                  onClick={() => signInWithProvider(firebase.getGoogleProvider())}
+                >
                   <GoogleIcon className={classes.googleIcon} />
                 </IconButton>
               </Tooltip>
@@ -226,6 +250,7 @@ const Login = (props) => {
                   className={classes.button}
                   aria-label="add an alarm"
                   disabled={isAuthenticating}
+                  onClick={() => signInAnonymously()}
                 >
                   <Icon>account_box</Icon>
                 </IconButton>

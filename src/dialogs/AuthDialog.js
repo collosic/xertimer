@@ -8,17 +8,20 @@ const AuthLogin = ({ fullScreen, onClose }) => {
   const [isSignUpDialogOpen, setIsSignUpDialogOpen] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
 
-  const openSignUpDialog = () => {
+  const openSignUpDialog = (e) => {
+    e.stopPropagation();
     setIsSignUpDialogOpen(true);
     setIsLoginDialogOpen(false);
   };
 
-  const openLoginDialog = () => {
+  const openLoginDialog = (e) => {
+    e.stopPropagation();
     setIsLoginDialogOpen(true);
     setIsSignUpDialogOpen(false);
   };
 
   const handleClose = () => {
+    // TODO: make authenticating need to disable the close
     setOpen(false);
     onClose(); // Used to Update the state of the parent component
   };
