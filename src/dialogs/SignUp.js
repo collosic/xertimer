@@ -86,23 +86,10 @@ const SignUp = (props) => {
 
   const [errors, setErrors] = useState(null);
 
-  const generateUserData = () => ({
-    user: {
-      email: values.emailAddress,
-      emailVerified: false,
-    },
-    additionalUserInfo: {
-      profile: {
-        given_name: values.name,
-      },
-      isNewUser: true,
-    },
-  });
-
   async function createNewAccount({ emailAddress, password }) {
     try {
       await firebase.createAccount(emailAddress, password);
-      await firebase.addUserAccount(generateUserData());
+      await firebase.initEmailProfile(values.name);
       props.history.replace('/xertimer');
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
@@ -113,8 +100,6 @@ const SignUp = (props) => {
         setErrors({ emailAddress: [error.message] });
       }
       console.log(error.message);
-    } finally {
-      setIsAuthenticating(false);
     }
   }
 

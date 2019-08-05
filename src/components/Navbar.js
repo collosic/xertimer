@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -21,7 +21,16 @@ const useStyles = makeStyles(theme => ({
 
 const NavBar = (props) => {
   const classes = useStyles();
-  const { currentUser } = firebase.auth;
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const user = await firebase.getCurrentUser();
+      setCurrentUser(user);
+    };
+
+    getUser();
+  }, []);
 
   async function signOutUser() {
     await firebase.logout();
@@ -35,7 +44,7 @@ const NavBar = (props) => {
           <Typography variant="h6" className={classes.title}>
             Xertimer
           </Typography>
-          {currentUser && currentUser.uid && (
+          {currentUser && (
             <Button color="inherit" onClick={signOutUser}>
               Sign Out
             </Button>

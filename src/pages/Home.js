@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import firebase from '../components/Firebase';
 import Layout from '../components/Layout';
 import Welcome from '../components/Welcome';
-import Xertimer from './Xertimer';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -13,8 +13,18 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Home = () => {
+const Home = (props) => {
   const classes = useStyles();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const user = await firebase.getCurrentUser();
+      if (user && user.uid) {
+        props.history.replace('/xertimer');
+      }
+    };
+    getUser();
+  }, [props.history]);
 
   return (
     <div className={classes.container}>
@@ -24,4 +34,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withRouter(Home);

@@ -40,6 +40,10 @@ class Firebase {
     return this.auth.signInAnonymously();
   }
 
+  resetPasswordEmail(emailAddress) {
+    return this.auth.sendPasswordResetEmail(emailAddress);
+  }
+
   getCurrentUser() {
     return this.isInitialized();
   }
@@ -49,19 +53,27 @@ class Firebase {
     return newProvider;
   }
 
-  addUserAccount(userData) {
-    if (!this.auth.currentUser) {
+  async initEmailProfile(name) {
+    const user = await this.getCurrentUser();
+    try {
+      await user.updateProfile({
+        displayName: name,
+      });
+      await this.addUserAccount(user);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  addUserAccount(user) {
+    if (!user) {
       console.log('User not currently logged int');
       return null;
     }
-    const { uid } = this.auth.currentUser;
 
-    return this.db.doc(`users/${uid}`).set({
-      uid,
-      firstName: userData.additionalUserInfo.profile.given_name,
-      email: userData.user.email,
-      emailVerified: userData.user.emailVerified,
-      isNewUser: userData.additionalUserInfo.isNewUser,
+    return this.db.doc(`users/${user.uid}`).set({
+      uid: user.uid,
+      email: user.email,
     });
   }
 

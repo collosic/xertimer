@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Hidden, Typography } from '@material-ui/core';
 import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
@@ -18,12 +19,15 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Typography } from '@material-ui/core';
+
 import FacebookBoxIcon from 'mdi-material-ui/FacebookBox';
 import GoogleIcon from 'mdi-material-ui/Google';
 import constraints from '../constraints';
 
 import firebase from '../components/Firebase';
+
+import ResetPassword from './ResetPassword';
+import Spinner from '../components/Spinner';
 
 const useStyles = makeStyles(theme => ({
   outerContainer: {
@@ -82,10 +86,16 @@ const useStyles = makeStyles(theme => ({
   googleIcon: {
     color: '#DB4437',
   },
+  forgotPass: {
+    cursor: 'pointer',
+    marginTop: '5px',
+  },
 }));
 
 const Login = (props) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isResetPassDialogOpen, setResetPassDialogOpen] = useState(false);
+
   const [values, setValues] = useState({
     emailAddress: '',
     password: '',
@@ -95,6 +105,7 @@ const Login = (props) => {
 
   const signIn = () => {
     setIsAuthenticating(true);
+    props.onAuthenticating(true);
     async function signInUser({ emailAddress, password }) {
       try {
         await firebase.login(emailAddress, password);
@@ -144,7 +155,7 @@ const Login = (props) => {
   const signInAnonymously = async () => {
     setIsAuthenticating(true);
     try {
-      const results = await firebase.signInAnonymously();
+      await firebase.signInAnonymously();
       props.history.replace('/Xertimer');
     } catch (error) {
       console.log(error);
@@ -161,6 +172,14 @@ const Login = (props) => {
 
   const handleChange = prop => (event) => {
     setValues({ ...values, [prop]: event.target.value });
+  };
+
+  const openResetPassDialog = () => {
+    setResetPassDialogOpen(true);
+  };
+
+  const closeResetPassDialog = () => {
+    setResetPassDialogOpen(false);
   };
 
   const classes = useStyles();
@@ -219,6 +238,15 @@ const Login = (props) => {
             >
               Login
             </Button>
+            <Typography
+              onClick={() => openResetPassDialog()}
+              className={classes.forgotPass}
+              variant="caption"
+              style={{ cursor: 'pointer' }}
+              color="textPrimary"
+            >
+              Reset Password?
+            </Typography>
           </DialogActions>
 
           <DialogContent className={classes.content}>
@@ -269,6 +297,17 @@ const Login = (props) => {
           </Button>
         </DialogActions>
       </div>
+      {isResetPassDialogOpen && (
+        <React.Fragment>
+          <Hidden only="xs">
+            <ResetPassword onClose={closeResetPassDialog} />
+          </Hidden>
+          <Hidden only={['sm', 'md', 'lg', 'xl']}>
+            <ResetPassword fullScreen onClose={closeResetPassDialog} />
+          </Hidden>
+        </React.Fragment>
+      )}
+      {isAuthenticating && <Spinner />}
     </div>
   );
 };

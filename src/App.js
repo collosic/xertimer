@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { CssBaseline, CircularProgress } from '@material-ui/core';
+import { CssBaseline } from '@material-ui/core';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Xertimer from './pages/Xertimer';
+import Spinner from './components/Spinner';
 import firebase from './components/Firebase';
 
 const theme = createMuiTheme();
@@ -28,8 +29,6 @@ export default function App() {
       </Router>
     </MuiThemeProvider>
   ) : (
-    <div id="loader">
-      <CircularProgress />
-    </div>
+    <Spinner />
   );
 }
