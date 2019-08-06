@@ -60,6 +60,7 @@ class Firebase {
         displayName: name,
       });
       await this.addUserAccount(user);
+      await user.sendEmailVerification();
     } catch (error) {
       console.log(error);
     }

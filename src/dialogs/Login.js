@@ -28,6 +28,7 @@ import firebase from '../components/Firebase';
 
 import ResetPassword from './ResetPassword';
 import Spinner from '../components/Spinner';
+import CustomSnackBar from '../components/CustomSnackBar';
 
 const useStyles = makeStyles(theme => ({
   outerContainer: {
@@ -95,6 +96,7 @@ const useStyles = makeStyles(theme => ({
 const Login = (props) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isResetPassDialogOpen, setResetPassDialogOpen] = useState(false);
+  const [isSnackBarOpen, setIsSnackBarOpen] = useState(false);
 
   const [values, setValues] = useState({
     emailAddress: '',
@@ -103,12 +105,17 @@ const Login = (props) => {
   });
   const [errors, setErrors] = useState(null);
 
+  const setAuthenticating = (flag) => {
+    setIsAuthenticating(flag);
+    props.onAuthenticating(flag);
+  };
+
   const signIn = () => {
-    setIsAuthenticating(true);
-    props.onAuthenticating(true);
+    setAuthenticating(true);
     async function signInUser({ emailAddress, password }) {
       try {
         await firebase.login(emailAddress, password);
+        setAuthenticating(false);
         props.history.replace('/Xertimer');
       } catch (error) {
         if (error.code === 'auth/wrong-password') {
@@ -118,6 +125,7 @@ const Login = (props) => {
         } else {
           setErrors({ emailAddress: [error.message] });
         }
+        setAuthenticating(false);
       }
     }
 
@@ -134,6 +142,7 @@ const Login = (props) => {
 
     if (errs) {
       setErrors(errs);
+      setAuthenticating(false);
     } else {
       setErrors(null);
       signInUser(values);
@@ -141,25 +150,31 @@ const Login = (props) => {
   };
 
   async function signInWithProvider(provider) {
-    setIsAuthenticating(true);
+    setAuthenticating(true);
     try {
       const results = await firebase.signInWithProvider(provider);
       await firebase.addUserAccount(results);
       props.history.replace('/Xertimer');
     } catch (error) {
       // TODO: error out when email account is already in use
+      setAuthenticating(false);
       console.log(error.message);
     }
   }
 
   const signInAnonymously = async () => {
-    setIsAuthenticating(true);
+    setAuthenticating(true);
     try {
       await firebase.signInAnonymously();
       props.history.replace('/Xertimer');
     } catch (error) {
+      setAuthenticating(false);
       console.log(error);
     }
+  };
+
+  const openSnackBar = () => {
+    setIsSnackBarOpen(true);
   };
 
   const handleClickShowPassword = prop => () => {
@@ -300,14 +315,15 @@ const Login = (props) => {
       {isResetPassDialogOpen && (
         <React.Fragment>
           <Hidden only="xs">
-            <ResetPassword onClose={closeResetPassDialog} />
+            <ResetPassword onClose={closeResetPassDialog} onEmailSent={openSnackBar} />
           </Hidden>
           <Hidden only={['sm', 'md', 'lg', 'xl']}>
-            <ResetPassword fullScreen onClose={closeResetPassDialog} />
+            <ResetPassword fullScreen onClose={closeResetPassDialog} onEmailSent={openSnackBar} />
           </Hidden>
         </React.Fragment>
       )}
       {isAuthenticating && <Spinner />}
+      {isSnackBarOpen && <CustomSnackBar message="Email sent successfully" />}
     </div>
   );
 };

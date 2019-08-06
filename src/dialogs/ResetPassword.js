@@ -14,7 +14,7 @@ import constraints from '../constraints';
 
 import Spinner from '../components/Spinner';
 
-const ResetPassword = ({ onClose }) => {
+const ResetPassword = ({ onClose, onEmailSent }) => {
   const [open, setOpen] = useState(true);
   const [emailAddress, setEmailAddress] = useState('');
   const [errors, setErrors] = useState(null);
@@ -49,6 +49,7 @@ const ResetPassword = ({ onClose }) => {
       setErrors(null);
       try {
         await firebase.resetPasswordEmail(emailAddress);
+        onEmailSent();
         setIsSendingEmail(false);
         handleResetPassClose();
       } catch (error) {

@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    background: 'rgba(204, 204, 204, 0.65)',
+    background: 'rgba(204, 204, 204, 0.70)',
     padding: '10px',
   },
   conatianerText: {
@@ -62,8 +62,8 @@ const Welcome = () => {
             </Typography>
             <Typography variant="body1">
               XerTimer is a custom interval timer that will assist you in making timers with
-              different lengths for each set. It also allows to make manual sets in the cases where
-              you are doing set number of reps instead of a timed set.
+              different lengths for each set. It also allows you to make manual sets in the cases
+              where you are doing set number of reps instead of a timed set.
             </Typography>
 
             <Button

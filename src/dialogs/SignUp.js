@@ -88,10 +88,16 @@ const SignUp = (props) => {
 
   const [errors, setErrors] = useState(null);
 
+  const setAuthenticating = (flag) => {
+    setIsAuthenticating(flag);
+    props.onAuthenticating(flag);
+  };
+
   async function createNewAccount({ emailAddress, password }) {
     try {
       await firebase.createAccount(emailAddress, password);
       await firebase.initEmailProfile(values.name);
+      setAuthenticating(false);
       props.history.replace('/xertimer');
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
@@ -101,13 +107,13 @@ const SignUp = (props) => {
       } else {
         setErrors({ emailAddress: [error.message] });
       }
+      setAuthenticating(false);
       console.log(error.message);
     }
   }
 
   const signUp = () => {
-    setIsAuthenticating(true);
-    props.onAuthenticating(true);
+    setAuthenticating(true);
     const errs = validate(
       {
         firstName: values.name,
@@ -125,6 +131,7 @@ const SignUp = (props) => {
 
     if (errs) {
       setErrors(errs);
+      setAuthenticating(false);
     } else {
       setErrors(null);
       createNewAccount(values);
@@ -247,7 +254,7 @@ const SignUp = (props) => {
               fullWidth
               onClick={() => signUp()}
             >
-              Login
+              Sign Up
             </Button>
           </DialogActions>
         </div>
