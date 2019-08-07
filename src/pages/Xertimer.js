@@ -1,28 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import firebase from '../components/Firebase';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
+import XertimerMain from '../components/XertimerMain';
+
+const useStyles = makeStyles(() => ({
+  container: {
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+}));
 
 const Xertimer = () => {
-  const [userInfo, setUserInfo] = useState(null);
-  const initUser = async () => {
-    const user = await firebase.getCurrentUser();
-    if (user && user.uid) {
-      setUserInfo(user);
-    }
-  };
-
-  useEffect(() => {
-    initUser();
-  }, []);
+  const classes = useStyles();
 
   return (
-    <React.Fragment>
+    <div className={classes.container}>
       <Layout />
-      <div>
-        Logged In as
-        {` ${userInfo && !userInfo.isAnonymous ? userInfo.displayName : 'Guest'}`}
-      </div>
-    </React.Fragment>
+      <XertimerMain />
+    </div>
   );
 };
 

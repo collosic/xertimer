@@ -24,7 +24,7 @@ const Home = (props) => {
       }
     };
     getUser();
-  }, [props.history]);
+  }, []);
 
   return (
     <div className={classes.container}>

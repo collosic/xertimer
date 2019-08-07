@@ -54,7 +54,7 @@ const Welcome = () => {
   return (
     <React.Fragment>
       <CssBaseline />
-      <div className={classes.container}>
+      <main className={classes.container}>
         <div className={classes.containerContent}>
           <Container maxWidth="sm" className={classes.conatianerText}>
             <Typography variant="h4" gutterBottom>
@@ -62,13 +62,14 @@ const Welcome = () => {
             </Typography>
             <Typography variant="body1">
               XerTimer is a custom interval timer that will assist you in making timers with
-              different lengths for each set. It also allows you to make manual sets in the cases
+              customized lengths for each rep in a set. You can create multiple sets each with their
+              own unique rep and rest times. It also allows you to make manual sets in the cases
               where you are doing set number of reps instead of a timed set.
             </Typography>
 
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               size="large"
               className={classes.button}
               onClick={() => openAuthDialog()}
@@ -87,7 +88,7 @@ const Welcome = () => {
             </Hidden>
           </React.Fragment>
         )}
-      </div>
+      </main>
     </React.Fragment>
   );
 };

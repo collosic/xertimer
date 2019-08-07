@@ -149,12 +149,25 @@ const Login = (props) => {
     }
   };
 
+  const determineIfNewUserandRoute = async (results) => {
+    const newUser = results.additionalUserInfo.isNewUser;
+    if (newUser) {
+      const userData = {
+        uid: results.user.uid,
+        email: results.user.email,
+      };
+      await firebase.addUserAccount(userData);
+      props.history.replace('/Xertimer');
+    } else {
+      props.history.replace('/Xertimer');
+    }
+  };
+
   async function signInWithProvider(provider) {
     setAuthenticating(true);
     try {
       const results = await firebase.signInWithProvider(provider);
-      await firebase.addUserAccount(results);
-      props.history.replace('/Xertimer');
+      determineIfNewUserandRoute(results);
     } catch (error) {
       // TODO: error out when email account is already in use
       setAuthenticating(false);
@@ -247,7 +260,7 @@ const Login = (props) => {
               className={classes.button}
               disabled={!values.emailAddress || !values.password || isAuthenticating}
               variant="contained"
-              color="primary"
+              color="secondary"
               fullWidth
               onClick={() => signIn()}
             >
