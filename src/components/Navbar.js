@@ -32,10 +32,10 @@ const NavBar = (props) => {
     getUser();
   }, []);
 
-  async function signOutUser() {
+  const signOutUser = async () => {
     await firebase.logout();
     props.history.replace('/');
-  }
+  };
 
   return (
     <div className={classes.root}>
