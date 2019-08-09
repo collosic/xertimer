@@ -19,7 +19,6 @@ const Home = (props) => {
   useEffect(() => {
     const getUser = async () => {
       const user = await firebase.getCurrentUser();
-      console.log(user);
       if (user && user.uid) {
         props.history.replace('/xertimer');
       }

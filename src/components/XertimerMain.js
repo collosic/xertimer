@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const XertimerMain = ({ onCreateSetClick }) => {
+const XertimerMain = ({ onCreateSetClick, workouts }) => {
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const initCurrentUser = async () => {
     const user = await firebase.getCurrentUser();
@@ -70,6 +70,7 @@ const XertimerMain = ({ onCreateSetClick }) => {
 
   useEffect(() => {
     initCurrentUser();
+    console.log(workouts);
   }, []);
 
   const handleClick = () => {

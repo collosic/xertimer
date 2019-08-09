@@ -58,9 +58,8 @@ const types = [
   },
 ];
 
-const CreateSetForm = ({ onClose }) => {
-  const initState = {
-    resetValues: false,
+const CreateSetForm = ({ onClose, updateState }) => {
+  const initValueState = {
     type: '',
     title: '',
     minutes: 0,
@@ -71,9 +70,19 @@ const CreateSetForm = ({ onClose }) => {
     restMinutes: 0,
     restSeconds: 0,
   };
-  const [values, setValues] = useState(initState);
+  const initTotalWorkout = {
+    count: 0,
+    sets: [],
+  };
+  const [values, setValues] = useState(initValueState);
+  const [totalWorkout, setTotalWorkout] = useState(initTotalWorkout);
   const [isFirstSet, setIsFirstSet] = useState(true);
+  const [errors, setErrors] = useState(null);
   const classes = useStyles();
+
+  useEffect(() => {
+    updateState(totalWorkout.sets);
+  }, [totalWorkout.sets]);
 
   const getDetailsOfType = () => {
     switch (values.type) {
@@ -87,7 +96,7 @@ const CreateSetForm = ({ onClose }) => {
   };
 
   const handleTypeChange = prop => (e) => {
-    setValues({ ...initState, type: e.target.value });
+    setValues({ ...initValueState, type: e.target.value });
   };
 
   const handleTimeField = prop => (e) => {
@@ -95,23 +104,50 @@ const CreateSetForm = ({ onClose }) => {
     setValues({ ...values, [prop]: time < 0 || time > 59 ? 0 : time });
   };
 
-  const handleRepeatChange = prop => (e) => {
-    const repeat = e.target.value;
+  const handleRepeatChange = (e) => {
+    const repeat = e;
     if (!repeat) {
       setValues({
         ...values,
+        repeat,
         addRestToRepeat: false,
         restMinutes: 0,
         restSeconds: 0,
       });
+    } else {
+      setValues({ ...values, repeat });
     }
+  };
+
+  const handleNumOfRepititions = prop => (e) => {
+    const num = e.target.value;
+    setValues({ ...values, numberOfRepititions: num < 1 || num > 20 ? 1 : num });
   };
 
   const handleChange = prop => (e) => {
     setValues({ ...values, [prop]: e.target.value });
   };
 
-  const handleNext = (e) => {};
+  const handleNext = () => {
+    // Error checking on certain fields
+    if (values.minutes === 0 && values.seconds === 0) {
+      setErrors({ seconds: 'Must have a value greater than 0' });
+    } else if (values.addRestToRepeat && values.restMinutes === 0 && values.restSeconds === 0) {
+      setErrors({ restSeconds: 'Must have a value greater than 0' });
+    } else {
+      const newSets = [...totalWorkout.sets];
+      newSets.push(values);
+      setTotalWorkout(prevSet => ({ count: prevSet.count + 1, sets: newSets }));
+      setErrors(null);
+      setValues({ ...initValueState });
+      console.log(totalWorkout);
+    }
+  };
+
+  const handleFinish = () => {
+    handleNext();
+    onClose(totalWorkout);
+  };
 
   const handleBack = (e) => {
     if (isFirstSet) {
@@ -125,6 +161,8 @@ const CreateSetForm = ({ onClose }) => {
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
             Create Workout
+            {' '}
+            {totalWorkout.count}
           </Typography>
           <React.Fragment>
             <Grid container spacing={3}>
@@ -181,7 +219,9 @@ const CreateSetForm = ({ onClose }) => {
                   name="seconds"
                   label="Seconds"
                   fullWidth
+                  error={!!(errors && errors.seconds)}
                   value={values.seconds}
+                  helperText={errors && errors.seconds}
                   onChange={handleTimeField('seconds')}
                   type="number"
                   disabled={!values.type || values.type === 'exerciseNoTimer'}
@@ -196,8 +236,7 @@ const CreateSetForm = ({ onClose }) => {
                       color="secondary"
                       name="repeat"
                       checked={values.repeat}
-                      onChange={(e, checked) => handleChange('repeat')({ target: { value: checked } })
-                      }
+                      onChange={(e, checked) => handleRepeatChange(checked)}
                     />
 )}
                   label="Repeat card"
@@ -210,7 +249,7 @@ const CreateSetForm = ({ onClose }) => {
                   label="Number of repititions"
                   type="number"
                   value={values.numberOfRepititions}
-                  onChange={handleRepeatChange()}
+                  onChange={handleNumOfRepititions()}
                   fullWidth
                   disabled={!values.repeat}
                   inputProps={{ min: '1', max: '20', step: '1' }}
@@ -251,6 +290,8 @@ const CreateSetForm = ({ onClose }) => {
                       name="restSeconds"
                       label="Rest Seconds"
                       fullWidth
+                      error={!!(errors && errors.restSeconds)}
+                      helperText={errors && errors.restSeconds}
                       value={values.restSeconds}
                       onChange={handleTimeField('restSeconds')}
                       type="number"
@@ -268,6 +309,7 @@ const CreateSetForm = ({ onClose }) => {
             <Button
               variant="contained"
               color="primary"
+              disabled={!values.type}
               onClick={() => handleNext()}
               className={classes.button}
             >
@@ -276,7 +318,8 @@ const CreateSetForm = ({ onClose }) => {
             <Button
               variant="outlined"
               color="primary"
-              onClick={console.log('next')}
+              onClick={() => handleFinish()}
+              disabled={!values.type}
               className={classes.button}
             >
               Finish
