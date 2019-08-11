@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { typeAnnotation } from '@babel/types';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
 import CreateSetForm from '../components/CreateSetForm';
@@ -23,7 +22,7 @@ const Xertimer = () => {
     setIsCreateSetFormOpen(true);
   };
 
-  const closeCreateSetForm = (set) => {
+  const closeCreateSetForm = () => {
     const totalWorkouts = [...allWorkouts];
     totalWorkouts.push(newWorkout);
     setAllWorkouts(totalWorkouts);

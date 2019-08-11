@@ -68,7 +68,6 @@ class Firebase {
 
   addUserAccount(user) {
     if (!user) {
-      console.log('User not currently logged int');
       return null;
     }
 
@@ -79,7 +78,7 @@ class Firebase {
   }
 
   isInitialized() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.auth.onAuthStateChanged(resolve);
     });
   }
