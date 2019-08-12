@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
 import CreateSetForm from '../components/CreateSetForm';
 
+// Xertimer context
+export const NewWorkoutContext = React.createContext();
+
+// Styles
 const useStyles = makeStyles(() => ({
   container: {
     height: '100vh',
@@ -12,10 +16,44 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+// Initial States
+const initNewWorkout = [];
+
+const initAllWorkouts = {
+  sets: [],
+};
+
+const newWorkoutReducer = (state, action) => {
+  switch (action.type) {
+    case 'add':
+      return [...state, action.value];
+    default:
+      break;
+  }
+};
+
+const allWorkoutsReducer = (state, action) => {
+  switch (action.type) {
+    case 'resetAllWorkoutsState':
+      return { ...initAllWorkouts };
+    case 'addWorkout':
+      return { ...state };
+    default:
+      break;
+  }
+};
+
+// Component
 const Xertimer = () => {
+  const [newWorkout, newWorkoutDispatch] = useReducer(
+    newWorkoutReducer,
+    initNewWorkout,
+  );
+  const [allWorkouts, allWorkoutsDispatch] = useReducer(
+    allWorkoutsReducer,
+    initAllWorkouts,
+  );
   const [isCreateSetFormOpen, setIsCreateSetFormOpen] = useState(false);
-  const [newWorkout, setNewWorkout] = useState([]);
-  const [allWorkouts, setAllWorkouts] = useState([]);
   const classes = useStyles();
 
   const openCreateSetForm = () => {
@@ -23,27 +61,28 @@ const Xertimer = () => {
   };
 
   const closeCreateSetForm = () => {
-    const totalWorkouts = [...allWorkouts];
-    totalWorkouts.push(newWorkout);
-    setAllWorkouts(totalWorkouts);
     setIsCreateSetFormOpen(false);
   };
 
-  const addNewWorkout = (sets) => {
-    setNewWorkout({ ...sets });
-  };
-
-  const getView = () => (isCreateSetFormOpen ? (
-    <CreateSetForm onClose={closeCreateSetForm} updateState={addNewWorkout} />
-  ) : (
-    <XertimerMain onCreateSetClick={openCreateSetForm} workouts={allWorkouts} />
-  ));
+  const getView = () =>
+    isCreateSetFormOpen ? (
+      <CreateSetForm onClose={closeCreateSetForm} />
+    ) : (
+      <XertimerMain
+        onCreateSetClick={openCreateSetForm}
+        workouts={newWorkout}
+      />
+    );
 
   return (
-    <div className={classes.container}>
-      <Layout />
-      {getView()}
-    </div>
+    <NewWorkoutContext.Provider
+      value={{ state: newWorkout, dispatch: newWorkoutDispatch }}
+    >
+      <div className={classes.container}>
+        <Layout />
+        {getView()}
+      </div>
+    </NewWorkoutContext.Provider>
   );
 };
 
