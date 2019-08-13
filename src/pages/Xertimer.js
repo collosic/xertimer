@@ -12,20 +12,22 @@ const useStyles = makeStyles(() => ({
   container: {
     height: '100vh',
     display: 'flex',
-    flexDirection: 'column',
-  },
+    flexDirection: 'column'
+  }
 }));
 
 // Initial States
 const initNewWorkout = [];
 
 const initAllWorkouts = {
-  sets: [],
+  sets: []
 };
 
 const newWorkoutReducer = (state, action) => {
   switch (action.type) {
-    case 'add':
+    case 'RESET_STATE':
+      return initNewWorkout;
+    case 'ADD':
       return [...state, action.value];
     default:
       break;
@@ -47,11 +49,11 @@ const allWorkoutsReducer = (state, action) => {
 const Xertimer = () => {
   const [newWorkout, newWorkoutDispatch] = useReducer(
     newWorkoutReducer,
-    initNewWorkout,
+    initNewWorkout
   );
   const [allWorkouts, allWorkoutsDispatch] = useReducer(
     allWorkoutsReducer,
-    initAllWorkouts,
+    initAllWorkouts
   );
   const [isCreateSetFormOpen, setIsCreateSetFormOpen] = useState(false);
   const classes = useStyles();
