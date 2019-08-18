@@ -2,7 +2,7 @@ import React, { useState, useReducer } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
-import CreateSetForm from '../components/CreateSetForm';
+import ExerciseLayout from '../components/ExerciseLayout';
 
 // Xertimer context
 export const NewWorkoutContext = React.createContext();
@@ -12,15 +12,15 @@ const useStyles = makeStyles(() => ({
   container: {
     height: '100vh',
     display: 'flex',
-    flexDirection: 'column'
-  }
+    flexDirection: 'column',
+  },
 }));
 
 // Initial States
 const initNewWorkout = [];
 
 const initAllWorkouts = {
-  sets: []
+  sets: [],
 };
 
 const newWorkoutReducer = (state, action) => {
@@ -29,6 +29,10 @@ const newWorkoutReducer = (state, action) => {
       return initNewWorkout;
     case 'ADD':
       return [...state, action.value];
+    case 'DELETE':
+      return [...state];
+    case 'ADJUST':
+      return [...action.value];
     default:
       break;
   }
@@ -49,16 +53,17 @@ const allWorkoutsReducer = (state, action) => {
 const Xertimer = () => {
   const [newWorkout, newWorkoutDispatch] = useReducer(
     newWorkoutReducer,
-    initNewWorkout
+    initNewWorkout,
   );
   const [allWorkouts, allWorkoutsDispatch] = useReducer(
     allWorkoutsReducer,
-    initAllWorkouts
+    initAllWorkouts,
   );
   const [isCreateSetFormOpen, setIsCreateSetFormOpen] = useState(false);
   const classes = useStyles();
 
   const openCreateSetForm = () => {
+    newWorkoutDispatch({ type: 'RESET_STATE' });
     setIsCreateSetFormOpen(true);
   };
 
@@ -68,7 +73,8 @@ const Xertimer = () => {
 
   const getView = () =>
     isCreateSetFormOpen ? (
-      <CreateSetForm onClose={closeCreateSetForm} />
+      //<CreateSetForm onClose={closeCreateSetForm} />
+      <ExerciseLayout onBack={closeCreateSetForm} />
     ) : (
       <XertimerMain
         onCreateSetClick={openCreateSetForm}

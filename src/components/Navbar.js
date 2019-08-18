@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const NavBar = (props) => {
+const NavBar = props => {
   const classes = useStyles();
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -39,13 +39,13 @@ const NavBar = (props) => {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static">
+      <AppBar position='static'>
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            Xertimer
+          <Typography variant='h6' className={classes.title}>
+            XerTimer
           </Typography>
           {currentUser && (
-            <Button color="inherit" onClick={signOutUser}>
+            <Button color='inherit' onClick={signOutUser}>
               Sign Out
             </Button>
           )}
