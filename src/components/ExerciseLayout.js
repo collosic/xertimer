@@ -22,11 +22,22 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     flexGrow: '1',
+  },
+  containerContent: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   layout: {
     width: '100%',
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
     [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {

@@ -9,12 +9,13 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import { MenuItem } from '@material-ui/core';
-import { NewWorkoutContext } from '../pages/Xertimer';
 import DialogActions from '@material-ui/core/DialogActions';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import uuid from 'uuid';
+
+import { CurrentWorkout } from '../store/Store'
 
 const useStyles = makeStyles(theme => ({
   outerContainer: {
@@ -131,7 +132,7 @@ const CreateSetForm = ({ onClose, fullScreen }) => {
     createCardReducer,
     initCreateCardState,
   );
-  const newWorkoutContext = useContext(NewWorkoutContext);
+  const newWorkoutContext = useContext(CurrentWorkout);
   const [isOpen, setIsOpen] = useState(true);
   const [errors, setErrors] = useState(null);
   const classes = useStyles();

@@ -12,8 +12,6 @@ import firebase from './Firebase';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    backgroundSize: '100%',
-    backgroundRepeat: 'no-repeat',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

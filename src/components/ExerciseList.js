@@ -17,8 +17,7 @@ import {
   sortableHandle,
 } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
-
-import { NewWorkoutContext } from '../pages/Xertimer';
+import { CurrentWorkout } from '../store/Store'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -39,7 +38,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ExerciseList = () => {
-  const currentWorkoutContext = useContext(NewWorkoutContext);
+  const currentWorkoutContext = useContext(CurrentWorkout);
 
   console.log(currentWorkoutContext.state);
   const classes = useStyles();

@@ -5,7 +5,8 @@ import XertimerMain from '../components/XertimerMain';
 import ExerciseLayout from '../components/ExerciseLayout';
 
 // Xertimer context
-export const NewWorkoutContext = React.createContext();
+import { CurrentWorkoutProvider } from '../store/Store';
+//export const NewWorkoutContext = React.createContext();
 
 // Styles
 const useStyles = makeStyles(() => ({
@@ -73,7 +74,6 @@ const Xertimer = () => {
 
   const getView = () =>
     isCreateSetFormOpen ? (
-      //<CreateSetForm onClose={closeCreateSetForm} />
       <ExerciseLayout onBack={closeCreateSetForm} />
     ) : (
       <XertimerMain
@@ -83,14 +83,12 @@ const Xertimer = () => {
     );
 
   return (
-    <NewWorkoutContext.Provider
-      value={{ state: newWorkout, dispatch: newWorkoutDispatch }}
-    >
+    <CurrentWorkoutProvider>
       <div className={classes.container}>
         <Layout />
         {getView()}
       </div>
-    </NewWorkoutContext.Provider>
+    </CurrentWorkoutProvider>
   );
 };
 
