@@ -7,27 +7,39 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { Tooltip } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
+import IconButton from '@material-ui/core/IconButton';
+import Icon from '@material-ui/core/Icon';
+import { PlayArrow, Edit, Delete } from '@material-ui/icons';
+
+// Custom Components
+import DeleteWorkoutDialog from '../dialogs/DeleteWorkoutDialog';
+
 import firebase from './Firebase';
 
 // Context
 import { AllWorkouts } from '../store/Store';
 
+
 const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     flexGrow: '1',
   },
   containerContent: {
     width: '100%',
-    height: '100%',
+    height: 'auto',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    padding: '50px 10px',
+    marginTop: '20px',
+    padding: '20px',
+    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+      padding: '20px 50px'
+    },
   },
   icon: {
     marginRight: theme.spacing(2),
@@ -47,12 +59,20 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    color: '#3c3c3c',
+    backgroundColor: '#E4E4E1',
+    backgroundImage: 'radial-gradient(at top center, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.03) 100%), linear-gradient(to top, rgba(255,255,255,0.1) 0%, rgba(143,152,157,0.60) 100%)',
+ 	  backgroundBlendMode: 'normal, multiply',
   },
   cardMedia: {
     paddingTop: '56.25%', // 16:9
   },
   cardContent: {
     flexGrow: 1,
+  },
+  cardButtons: {
+    display: 'flex',
+    justifyContent: 'space-around',
   },
   footer: {
     backgroundColor: theme.palette.background.paper,
@@ -63,6 +83,7 @@ const useStyles = makeStyles(theme => ({
 const XertimerMain = ({ onCreateSetClick }) => {
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const allWorkouts = useContext(AllWorkouts)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   useEffect(() => {
     const initCurrentUser = async () => {
@@ -89,6 +110,19 @@ const XertimerMain = ({ onCreateSetClick }) => {
   const handleClick = () => {
     onCreateSetClick();
   };
+
+  const openDeleteWorkoutDialog = () => {
+    setIsDeleteDialogOpen(true);
+  }
+
+  const deleteWorkout = () => {
+    setIsDeleteDialogOpen(false);
+    console.log('deleting workout')
+  }
+
+  const handleDelete = () => {
+    console.log('delete');
+  }
 
   const classes = useStyles();
 
@@ -138,22 +172,31 @@ const XertimerMain = ({ onCreateSetClick }) => {
                         ${card.workout.timerLength.min < 10 ? '0' : ''}${card.workout.timerLength.min}:${card.workout.timerLength.sec < 10 ? '0' : ''}${card.workout.timerLength.sec}`}
                     </Typography>
                   </CardContent>
-                  <CardActions>
-                    <Button size="small" color="primary">
-                      View
-                    </Button>
-                    <Button size="small" color="primary">
-                      Edit
-                    </Button>
-                    <Button size="small" color="secondary">
-                      Delete
-                    </Button>
+                  <CardActions className={classes.cardButtons}>
+                    <Tooltip title="Start">
+                      <IconButton color="primary">
+                        <PlayArrow />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit">
+                      <IconButton color="primary">
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton onClick={() => openDeleteWorkoutDialog()} color="secondary">
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
                   </CardActions>
                 </Card>
               </Grid>
             ))}
           </Grid>
         </Container>
+        {(isDeleteDialogOpen && (
+          <DeleteWorkoutDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} deleteWorkout={deleteWorkout} />
+        ))}
       </main>
     </>
   );

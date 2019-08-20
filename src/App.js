@@ -10,6 +10,10 @@ import Xertimer from './pages/Xertimer';
 import Spinner from './components/Spinner';
 import firebase from './components/Firebase';
 
+// Xertimer context
+import { CurrentWorkoutProvider } from './store/Store';
+import { AllWorkoutsProvider } from './store/Store';
+
 let theme = createMuiTheme({
   palette: {
     primary: indigo,
@@ -37,16 +41,21 @@ export default function App() {
   }, []);
 
   return firebaseInitialized !== false ? (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/xertimer" component={Xertimer} />
-        </Switch>
-      </Router>
-    </MuiThemeProvider>
-  ) : (
-    <Spinner />
-  );
+    <AllWorkoutsProvider>
+      <CurrentWorkoutProvider>
+        <MuiThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route exact path="/xertimer" component={Xertimer} />
+            </Switch>
+          </Router>
+        </MuiThemeProvider>
+      </CurrentWorkoutProvider>
+    </AllWorkoutsProvider>
+    ) : (
+      <Spinner />
+    );
+
 }

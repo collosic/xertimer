@@ -75,7 +75,7 @@ const initCreateCardState = {
   minutes: 0,
   seconds: 0,
   x_repeat: false,
-  x_numberOfRepetitions: 1,
+  x_numberOfRepetitions: 0,
   x_addRestToAllRepetitions: false,
   x_restMinutes: 0,
   x_restSeconds: 0
@@ -240,7 +240,7 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
           className={classes.layout}>
           <DialogTitle className={classes.title}>
             {isEditModeOn ? 'Edit ' : 'Create '}
-            Set
+            a Set
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
             <Grid container spacing={3}>
@@ -371,7 +371,7 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
               )}
               <Grid item xs={12} sm={6}>
                 <FormControlLabel
-                  disabled={!createCard.type || createCard.type === 'REST'}
+                  disabled={!createCard.type || createCard.type === 'REST' || isEditModeOn}
                   control={
                     <Checkbox
                       color="secondary"

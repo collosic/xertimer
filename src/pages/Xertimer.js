@@ -1,12 +1,12 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
 import ExerciseLayout from '../components/ExerciseLayout';
 
 // Xertimer context
-import { CurrentWorkoutProvider } from '../store/Store';
-import { AllWorkoutsProvider } from '../store/Store';
+import { CurrentWorkout } from '../store/Store';
+import { AllWorkouts } from '../store/Store';
 
 // Styles
 const useStyles = makeStyles(() => ({
@@ -17,54 +17,14 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-// Initial States
-const initNewWorkout = [];
-
-const initAllWorkouts = {
-  sets: [],
-};
-
-const newWorkoutReducer = (state, action) => {
-  switch (action.type) {
-    case 'RESET_STATE':
-      return initNewWorkout;
-    case 'ADD':
-      return [...state, action.value];
-    case 'DELETE':
-      return [...state];
-    case 'ADJUST':
-      return [...action.value];
-    default:
-      break;
-  }
-};
-
-const allWorkoutsReducer = (state, action) => {
-  switch (action.type) {
-    case 'RESET_STATE':
-      return { ...initAllWorkouts };
-    case 'OVERRIDE':
-      return { ...action.value };
-    default:
-      break;
-  }
-};
-
 // Component
 const Xertimer = () => {
-  const [newWorkout, newWorkoutDispatch] = useReducer(
-    newWorkoutReducer,
-    initNewWorkout,
-  );
-  const [allWorkouts, allWorkoutsDispatch] = useReducer(
-    allWorkoutsReducer,
-    initAllWorkouts,
-  );
+  const currentWorkout = useContext(CurrentWorkout)
   const [isCreateSetFormOpen, setIsCreateSetFormOpen] = useState(false);
   const classes = useStyles();
 
   const openCreateSetForm = () => {
-    newWorkoutDispatch({ type: 'RESET_STATE' });
+    currentWorkout.dispatch({ type: 'RESET_STATE' });
     setIsCreateSetFormOpen(true);
   };
 
@@ -78,19 +38,14 @@ const Xertimer = () => {
     ) : (
       <XertimerMain
         onCreateSetClick={openCreateSetForm}
-        workouts={newWorkout}
       />
     );
 
   return (
-    <AllWorkoutsProvider>
-      <CurrentWorkoutProvider>
-        <div className={classes.container}>
-          <Layout />
-          {getView()}
-        </div>
-      </CurrentWorkoutProvider>
-    </AllWorkoutsProvider>
+    <div className={classes.container}>
+      <Layout />
+      {getView()}
+    </div>
   );
 };
 

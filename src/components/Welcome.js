@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    background: 'rgba(204, 204, 204, 0.70)',
+    background: 'rgba(204, 204, 204, 0.80)',
     padding: '10px',
   },
   conatianerText: {

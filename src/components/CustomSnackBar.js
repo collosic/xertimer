@@ -23,6 +23,7 @@ const CustomSnackBar = ({ message, onClose }) => {
         autoHideDuration={3000}
         ContentProps={{
           'aria-describedby': 'message-id',
+          style: { textAlign: 'center' },
         }}
         message={<span id="message-id">{message}</span>}
       />

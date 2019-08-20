@@ -63,7 +63,7 @@ const ExerciseList = ({ onEdit }) => {
   const DragHandle = sortableHandle(() => {
     return (
       <ListItemIcon className={classes.reorderIcon}>
-        <ReorderIcon className={classes.reorderIcon} />
+        <ReorderIcon color='primary' className={classes.reorderIcon} />
       </ListItemIcon>
     );
   });
@@ -120,6 +120,7 @@ const ExerciseList = ({ onEdit }) => {
             <Tooltip title='Delete'>
               <IconButton
                 onClick={() => handleDelete(uuid)}
+                color='secondary'
                 edge='end'
                 aria-label='delete'
               >

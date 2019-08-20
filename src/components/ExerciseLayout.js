@@ -18,11 +18,15 @@ import CreateSetDialog from '../dialogs/CreateSetDialog';
 import CustomSnackBar from './CustomSnackBar';
 import Spinner from './Spinner';
 
+// Dialogs
+import BackButtonDialog from '../dialogs/BackButtonDialog'
+
 // Firebase Class
 import firebase from './Firebase';
 
 // Contexts
 import { CurrentWorkout, AllWorkouts } from '../store/Store';
+import { LocalConvenienceStoreOutlined } from '@material-ui/icons';
 
 
 // Styles
@@ -43,8 +47,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    marginRight: 0,
     [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
       width: 600,
       height: '100%',
@@ -69,10 +73,10 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
   },
   subHeaderText: {
-    flex: '1 0 auto',
     fontSize: 24,
     textAlign: 'center',
     padding: theme.spacing(0),
+    flex: '1 1 auto',
   },
   divider: {
     margin: 10,
@@ -92,6 +96,7 @@ const useStyles = makeStyles(theme => ({
 
 const ExerciseLayout = ({ onBack }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isBackButtonDialogOpen, setIsBackButtonDialogOpen] = useState(false);
   const [editModeOn, setEditModeOn] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [workoutName, setWorkoutName] = useState('');
@@ -130,7 +135,11 @@ const ExerciseLayout = ({ onBack }) => {
   }
 
   const handleBack = () => {
-    onBack();
+    if (currentWorkoutContext.state.length > 0) {
+      setIsBackButtonDialogOpen(true);
+    } else {
+      onBack();
+    }
   }
 
   const handleChange = (e) => {
@@ -140,7 +149,10 @@ const ExerciseLayout = ({ onBack }) => {
   const handleSave = async () => {
     // Check to see if user added name for the workout
     if (workoutName === '') {
-      setErrors({ workoutName: 'Must provide a title for the workout' });
+      setErrors({ message: 'Must provide a title for the workout' });
+      setOpenSnackBar(true);
+    } else if (currentWorkoutContext.state.length === 0) {
+      setErrors({ message: 'Must add at least one exercise' });
       setOpenSnackBar(true);
     } else {
       setIsSaving(true);
@@ -149,6 +161,8 @@ const ExerciseLayout = ({ onBack }) => {
       // Save workout to Firestore
       try {
         await firebase.addNewWorkout(completeWorkout);
+        // clear currentWorkoutContext
+        
       } catch(e) {
         console.log(e);
       }   
@@ -164,6 +178,7 @@ const ExerciseLayout = ({ onBack }) => {
   const classes = useStyles();
 
   useEffect(() => {
+    console.log('Component Did Mount')
     const setTotalTimeFunc = () => {
       // Extract the total minutes and seconds from the Workout Context
       const totalMin = currentWorkoutContext.state.reduce((total, set) => total + set.minutes, 0);
@@ -175,7 +190,7 @@ const ExerciseLayout = ({ onBack }) => {
     }
 
     setTotalTimeFunc();
-  }, [currentWorkoutContext.state])
+  }, [currentWorkoutContext])
 
   return (
     <div className={classes.container}>
@@ -239,8 +254,18 @@ const ExerciseLayout = ({ onBack }) => {
           </Hidden>
         </>
       )}
+      {isBackButtonDialogOpen && (
+        <BackButtonDialog 
+          open={isBackButtonDialogOpen} 
+          stay={() => setIsBackButtonDialogOpen(false)} 
+          goBack={() => {
+            setIsBackButtonDialogOpen(false) ;
+            onBack();
+          }} 
+        />
+      )}
       {openSnackBar && (
-        <CustomSnackBar message={errors.workoutName} onClose={handleCloseSnackBar} />
+        <CustomSnackBar message={errors.message} onClose={handleCloseSnackBar} />
       )}
       {isSaving && (
         <Spinner />
