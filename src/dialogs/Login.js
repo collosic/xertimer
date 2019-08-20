@@ -115,6 +115,7 @@ const Login = (props) => {
     async function signInUser({ emailAddress, password }) {
       try {
         await firebase.login(emailAddress, password);
+        debugger;
         setAuthenticating(false);
         props.history.replace('/Xertimer');
       } catch (error) {

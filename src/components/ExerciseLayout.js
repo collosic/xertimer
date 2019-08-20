@@ -16,6 +16,10 @@ import Icon from '@material-ui/core/Icon';
 import ExerciseList from './ExerciseList';
 import CreateSetDialog from '../dialogs/CreateSetDialog';
 import CustomSnackBar from './CustomSnackBar';
+import Spinner from './Spinner';
+
+// Firebase Class
+import firebase from './Firebase';
 
 // Contexts
 import { CurrentWorkout, AllWorkouts } from '../store/Store';
@@ -94,10 +98,21 @@ const ExerciseLayout = ({ onBack }) => {
   const [errors, setErrors] = useState(null);
   const [id, setId] = useState(null);
   const [totalTime, setTotalTime] = useState({min: 0, sec: 0})
+  const [isSaving, setIsSaving] = useState(false);
 
   // Global States
   const currentWorkoutContext = useContext(CurrentWorkout);
   const allWorkouts = useContext(AllWorkouts);
+
+  const generateWorkoutObj = () => {
+    return {
+      title: workoutName,
+      allSets: [...currentWorkoutContext.state],
+      numberOfSets: currentWorkoutContext.state.filter(set => set.type !== 'REST').length,
+      timerLength: { ...totalTime },
+      numberOfCycles: 0,
+    }
+  }
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -116,27 +131,29 @@ const ExerciseLayout = ({ onBack }) => {
 
   const handleBack = () => {
     onBack();
-
   }
 
   const handleChange = (e) => {
     setWorkoutName(e.target.value);
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Check to see if user added name for the workout
     if (workoutName === '') {
       setErrors({ workoutName: 'Must provide a title for the workout' });
       setOpenSnackBar(true);
     } else {
-      const completeWorkout = {
-        title: workoutName,
-        allSets: [...currentWorkoutContext.state],
-        totalTime: { ...totalTime },
-        numberOfCycles: 0,
-      }
-      console.log(completeWorkout);
-
+      setIsSaving(true);
+      const completeWorkout = generateWorkoutObj();
+      
+      // Save workout to Firestore
+      try {
+        await firebase.addNewWorkout(completeWorkout);
+      } catch(e) {
+        console.log(e);
+      }   
+      setIsSaving(false);
+      onBack();
     }
   }
 
@@ -224,6 +241,9 @@ const ExerciseLayout = ({ onBack }) => {
       )}
       {openSnackBar && (
         <CustomSnackBar message={errors.workoutName} onClose={handleCloseSnackBar} />
+      )}
+      {isSaving && (
+        <Spinner />
       )}
     </div>
   );

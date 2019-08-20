@@ -4,7 +4,7 @@
     "es6": true,
     "node": true
   },
-  "extends": ["airbnb", "prettier"],
+  "extends": ["airbnb", "airbnb/hooks", "prettier"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -16,7 +16,8 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier"],
+  "parser": "babel-eslint",
+  "plugins": ["prettier"],
   "rules": {
     "react/jsx-filename-extension": "off"
   }

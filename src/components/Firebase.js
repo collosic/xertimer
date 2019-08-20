@@ -21,6 +21,7 @@ class Firebase {
   }
 
   login(email, password) {
+
     return this.auth.signInWithEmailAndPassword(email, password);
   }
 
@@ -29,10 +30,11 @@ class Firebase {
   }
 
   async createAccount(email, password) {
+    
     return this.auth.createUserWithEmailAndPassword(email, password);
   }
 
-  async signInWithProvider(provider) {
+  async signInWithProvider(provider) {    
     return this.auth.signInWithPopup(provider);
   }
 
@@ -77,14 +79,31 @@ class Firebase {
     });
   }
 
-  async getData(user) {
+  async addNewWorkout(workout) {
+    const currentUser = await this.getCurrentUser();
+    return this.db.collection('users').doc(`${currentUser.uid}`).collection('workouts').add({
+      title: workout.title,
+      numberOfCyles: workout.numberOfCycles,
+      numberOfSets: workout.numberOfSets,
+      timerLength: workout.timerLength,
+      sets: workout.allSets
+    });
+  }
+
+  async getWorkouts() {
+    const currentUser = await this.getCurrentUser();
+    return this.db.collection('users')
+      .doc(`${currentUser.uid}`).collection('workouts')
+        .get()
+  }
+
+  getData(user) {
     const docRef = this.db.collection('users').doc(`${user.uid}`).collection('workouts');
-    let allWorkouts = [];
 
     docRef.get().then(querySnapShot => {
       querySnapShot.forEach(doc => {
         if (doc.exists) {
-          console.log(`${doc.id} => ${doc.data()}`)
+          console.log(`${doc.id} => ${doc.data().title}`)
         } else {
           console.log('nothing here');
         }

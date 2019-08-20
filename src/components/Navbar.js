@@ -27,7 +27,6 @@ const NavBar = props => {
     const getUser = async () => {
       const user = await firebase.getCurrentUser();
       setCurrentUser(user);
-      await firebase.getData(user);
     };
 
     getUser();

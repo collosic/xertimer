@@ -41,10 +41,10 @@ const newWorkoutReducer = (state, action) => {
 
 const allWorkoutsReducer = (state, action) => {
   switch (action.type) {
-    case 'resetAllWorkoutsState':
+    case 'RESET_STATE':
       return { ...initAllWorkouts };
-    case 'addWorkout':
-      return { ...state };
+    case 'OVERRIDE':
+      return { ...action.value };
     default:
       break;
   }

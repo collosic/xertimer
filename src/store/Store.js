@@ -3,9 +3,7 @@ import React, { useReducer } from 'react';
 // Initial States
 const initCurrentWorkout = [];
 
-const initAllWorkouts = {
-  sets: [],
-};
+const initAllWorkouts = [];
 
 // Xertimer context
 export const CurrentWorkout = React.createContext(initCurrentWorkout);
@@ -30,9 +28,11 @@ const currentWorkoutReducer = (state, action) => {
 const allWorkoutsReducer = (state, action) => {
   switch (action.type) {
     case 'RESET_STATE':
-      return { ...initAllWorkouts };
+      return [ ...initAllWorkouts ];
     case 'ADD':
-      return { ...state };
+      return [ ...state, ...action.value];
+    case 'OVERRIDE':
+      return [ ...action.value ];
     default:
       break;
   }
