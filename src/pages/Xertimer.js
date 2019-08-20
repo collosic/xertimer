@@ -6,7 +6,7 @@ import ExerciseLayout from '../components/ExerciseLayout';
 
 // Xertimer context
 import { CurrentWorkoutProvider } from '../store/Store';
-//export const NewWorkoutContext = React.createContext();
+import { AllWorkoutsProvider } from '../store/Store';
 
 // Styles
 const useStyles = makeStyles(() => ({
@@ -83,12 +83,14 @@ const Xertimer = () => {
     );
 
   return (
-    <CurrentWorkoutProvider>
-      <div className={classes.container}>
-        <Layout />
-        {getView()}
-      </div>
-    </CurrentWorkoutProvider>
+    <AllWorkoutsProvider>
+      <CurrentWorkoutProvider>
+        <div className={classes.container}>
+          <Layout />
+          {getView()}
+        </div>
+      </CurrentWorkoutProvider>
+    </AllWorkoutsProvider>
   );
 };
 

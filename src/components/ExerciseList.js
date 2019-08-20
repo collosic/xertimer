@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
@@ -17,6 +17,7 @@ import {
   sortableHandle,
 } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
+
 import { CurrentWorkout } from '../store/Store'
 
 const useStyles = makeStyles(theme => ({
@@ -37,10 +38,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ExerciseList = () => {
+const ExerciseList = ({ onEdit }) => {
   const currentWorkoutContext = useContext(CurrentWorkout);
-
-  console.log(currentWorkoutContext.state);
   const classes = useStyles();
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -56,6 +55,10 @@ const ExerciseList = () => {
       value: currentWorkoutContext.state.filter(sets => sets.uuid !== uuid),
     });
   };
+
+  const handleEdit = uuid => {
+    onEdit(uuid);
+  }
 
   const DragHandle = sortableHandle(() => {
     return (
@@ -86,9 +89,9 @@ const ExerciseList = () => {
         <ListItem dense>
           <DragHandle />
           <ListItemText
-            id={`item-${title}`}
+            id={`item-${uuid}`}
             primary={<Typography variant='h6'>{`${title}`}</Typography>}
-            secondary={
+            secondary={(
               <>
                 <Typography
                   component='span'
@@ -106,11 +109,11 @@ const ExerciseList = () => {
                   {` - ${newType}`}
                 </Typography>
               </>
-            }
+            )}
           />
           <ListItemSecondaryAction>
             <Tooltip title='Edit'>
-              <IconButton edge='start' aria-label='edit'>
+              <IconButton onClick={() => handleEdit(uuid)} edge='start' aria-label='edit'>
                 <EditIcon />
               </IconButton>
             </Tooltip>
@@ -136,7 +139,7 @@ const ExerciseList = () => {
   return (
     <SortableContainer onSortEnd={onSortEnd} useDragHandle>
       {currentWorkoutContext.state.map((value, index) => (
-        <SortableItem key={`item-${index}`} index={index} value={value} />
+        <SortableItem key={`item-${value.uuid}`} index={index} value={value} />
       ))}
     </SortableContainer>
   );

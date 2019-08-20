@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 
-const CustomSnackBar = ({ message }) => {
+const CustomSnackBar = ({ message, onClose }) => {
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
+    onClose();
   };
+
+  useEffect(() => {
+    return () => {
+      setOpen(false)
+    };
+  })
 
   return (
     <div>

@@ -77,6 +77,23 @@ class Firebase {
     });
   }
 
+  async getData(user) {
+    const docRef = this.db.collection('users').doc(`${user.uid}`).collection('workouts');
+    let allWorkouts = [];
+
+    docRef.get().then(querySnapShot => {
+      querySnapShot.forEach(doc => {
+        if (doc.exists) {
+          console.log(`${doc.id} => ${doc.data()}`)
+        } else {
+          console.log('nothing here');
+        }
+      })
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+
   isInitialized() {
     return new Promise(resolve => {
       this.auth.onAuthStateChanged(resolve);

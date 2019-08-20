@@ -79,7 +79,7 @@ const XertimerMain = ({ onCreateSetClick, workouts }) => {
   const cards = [1, 2, 3, 4, 5, 6, 7];
 
   return (
-    <React.Fragment>
+    <>
       <CssBaseline />
       <main className={classes.container}>
         {/* Hero unit */}
@@ -138,7 +138,7 @@ const XertimerMain = ({ onCreateSetClick, workouts }) => {
           </Grid>
         </Container>
       </main>
-    </React.Fragment>
+    </>
   );
 };
 
