@@ -82,10 +82,11 @@ const useStyles = makeStyles(theme => ({
 
 const XertimerMain = ({ onCreateSetClick }) => {
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
-  const allWorkouts = useContext(AllWorkouts)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const allWorkouts = useContext(AllWorkouts)
   
   useEffect(() => {
+    //console.log('Component Did Mount')
     const initCurrentUser = async () => {
       const user = await firebase.getCurrentUser();
       const workouts = [];

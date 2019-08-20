@@ -122,7 +122,7 @@ const createCardReducer = (state, action) => {
 };
 
 // Component
-const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
+const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
   const [createCard, createCardDispatch] = useReducer(
     createCardReducer,
     initCreateCardState
@@ -132,10 +132,7 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
   const [errors, setErrors] = useState(null);
   const classes = useStyles();
 
-  const loadExistingSet = id => {
-    const currentCard = newWorkoutContext.state.filter(set => set.uuid === id && set)[0];
-    createCardDispatch({ type: 'LOAD', value: currentCard });
-  }
+  
 
   const getDetailsOfType = () => {
     switch (createCard.type) {
@@ -182,13 +179,19 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
     // Error checking on certain fields
     if (createCard.title === '') {
       setErrors({ title: 'Must provide a title for the set' });
-    } else if (
+      return false;
+    }
+    
+    if (
       createCard.type !== 'EXERCISE_NO_TIMER' &&
       createCard.minutes === 0 &&
       createCard.seconds === 0
     ) {
       setErrors({ seconds: 'Must have a value greater than 0' });
-    } else if (
+      return false;
+    }
+    
+    if (
       createCard.x_addRestToAllRepetitions &&
       createCard.x_restMinutes === 0 &&
       createCard.x_restSeconds === 0
@@ -200,6 +203,8 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
         return set.uuid === createCard.uuid ? { ...createCard } : set
       })
       newWorkoutContext.dispatch({ type: 'ADJUST', value: newCurrentWorkout })
+      setIsOpen(false);
+      handleClose();
     } else if (createCard.x_repeat) {
       createRepeatedWorkout();
       createCardDispatch({ type: 'RESET_STATE' });
@@ -209,12 +214,15 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
       createCardDispatch({ type: 'RESET_STATE' });
       setErrors(null);
     }
+    return true;
   };
 
   const handleFinish = () => {
-    handleNext();
-    setIsOpen(false);
-    handleClose();
+    const isFinished = handleNext();
+    if (isFinished) {
+      setIsOpen(false);
+      handleClose();
+    }
   };
 
   const handleRestTitle = () => {
@@ -223,12 +231,17 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
   };
 
   useEffect(() => {
+    const loadExistingSet = () => {
+      const currentCard = newWorkoutContext.state.filter(set => set.uuid === id && set)[0];
+      createCardDispatch({ type: 'LOAD', value: currentCard });
+    }
+
     if(isEditModeOn) {
-      loadExistingSet(id);
+      loadExistingSet();
     } else {
       createCardDispatch({type: 'INIT_UUID'});
     }
-  }, [])
+  }, [isEditModeOn, newWorkoutContext.state, id])
 
   return (
     <>
@@ -506,4 +519,4 @@ const CreateSetForm = ({ fullScreen, handleClose, isEditModeOn, id }) => {
   );
 };
 
-export default CreateSetForm;
+export default CreateSetDialog;

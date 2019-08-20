@@ -178,7 +178,7 @@ const ExerciseLayout = ({ onBack }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    console.log('Component Did Mount')
+    //console.log('Component Did Mount')
     const setTotalTimeFunc = () => {
       // Extract the total minutes and seconds from the Workout Context
       const totalMin = currentWorkoutContext.state.reduce((total, set) => total + set.minutes, 0);
