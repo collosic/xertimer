@@ -81,13 +81,25 @@ class Firebase {
 
   async addNewWorkout(workout) {
     const currentUser = await this.getCurrentUser();
-    return this.db.collection('users').doc(`${currentUser.uid}`).collection('workouts').add({
+    return this.db.collection('users')
+                  .doc(`${currentUser.uid}`)
+                  .collection('workouts')
+                  .add({
       title: workout.title,
       numberOfCyles: workout.numberOfCycles,
       numberOfSets: workout.numberOfSets,
       timerLength: workout.timerLength,
       sets: workout.allSets
     });
+  }
+
+  async deleteWorkout(docId) {
+    const currentUser = await this.getCurrentUser();
+    return this.db.collection('users')
+                  .doc(`${currentUser.uid}`)
+                  .collection('workouts')
+                  .doc(docId)
+                  .delete();
   }
 
   async getWorkouts() {

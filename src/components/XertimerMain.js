@@ -10,8 +10,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Tooltip } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import IconButton from '@material-ui/core/IconButton';
-import Icon from '@material-ui/core/Icon';
 import { PlayArrow, Edit, Delete } from '@material-ui/icons';
+import CustomSnackBar from './CustomSnackBar';
 
 // Custom Components
 import DeleteWorkoutDialog from '../dialogs/DeleteWorkoutDialog';
@@ -83,28 +83,32 @@ const useStyles = makeStyles(theme => ({
 const XertimerMain = ({ onCreateSetClick }) => {
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [currentCardId, setCurrentCardId] = useState(null);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [snackBarMsg, setSnackBarMsg] = useState('');
   const allWorkouts = useContext(AllWorkouts)
+
+  const loadWorkoutsFromFireStore = async () => {
+    const workouts = [];
+    try {
+      const snapShot = await firebase.getWorkouts();
+      snapShot.forEach(doc => {
+        workouts.push({ id: doc.id, workout: doc.data() })
+      })
+      allWorkouts.dispatch({ type: 'OVERRIDE', value: workouts })
+    } catch(e) {
+      console.log(e);
+    }
+  }
   
   useEffect(() => {
-    //console.log('Component Did Mount')
     const initCurrentUser = async () => {
       const user = await firebase.getCurrentUser();
-      const workouts = [];
       if (user && user.uid) {
         setCurrentUserInfo(user);
-        try {
-          const snapShot = await firebase.getWorkouts();
-          
-          snapShot.forEach(doc => {
-            workouts.push({ id: doc.id, workout: doc.data() })
-          })
-        } catch(e) {
-          console.log(e);
-        }
-        allWorkouts.dispatch({ type: 'OVERRIDE', value: workouts })
+        loadWorkoutsFromFireStore();
       }
     };
-  
     initCurrentUser();
   }, []);
 
@@ -112,19 +116,28 @@ const XertimerMain = ({ onCreateSetClick }) => {
     onCreateSetClick();
   };
 
-  const openDeleteWorkoutDialog = () => {
+  const openDeleteWorkoutDialog = (id) => {
+    setCurrentCardId(id);
     setIsDeleteDialogOpen(true);
   }
 
-  const deleteWorkout = () => {
+  const deleteWorkout = async () => {
     setIsDeleteDialogOpen(false);
-    console.log('deleting workout')
+    try {
+      await firebase.deleteWorkout(currentCardId);
+      setSnackBarMsg('Successfully deleted workout')
+      loadWorkoutsFromFireStore();
+    } catch (e) {
+      setSnackBarMsg('An error occured while attempting to delete workout');
+      console.log(e)
+    }
+    setOpenSnackBar(true);
   }
 
-  const handleDelete = () => {
-    console.log('delete');
+  const handleCloseSnackBar = () => {
+    setOpenSnackBar(false);
   }
-
+  
   const classes = useStyles();
 
   return (
@@ -185,7 +198,7 @@ const XertimerMain = ({ onCreateSetClick }) => {
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete">
-                      <IconButton onClick={() => openDeleteWorkoutDialog()} color="secondary">
+                      <IconButton onClick={() => openDeleteWorkoutDialog(card.id)} color="secondary">
                         <Delete />
                       </IconButton>
                     </Tooltip>
@@ -198,6 +211,9 @@ const XertimerMain = ({ onCreateSetClick }) => {
         {(isDeleteDialogOpen && (
           <DeleteWorkoutDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} deleteWorkout={deleteWorkout} />
         ))}
+        {openSnackBar && (
+          <CustomSnackBar message={snackBarMsg} onClose={handleCloseSnackBar} />
+        )}
       </main>
     </>
   );
