@@ -118,6 +118,10 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
     }
   };
 
+  const hasWorkoutChanged = () => {
+    console.log('checking...')
+  }
+
   const setTotalTimeFunc = useCallback(() => {
     // Extract the total minutes and seconds from the Workout Context
     const totalMin = currentWorkout.state.sets.reduce((total, set) => total + set.minutes, 0);
@@ -162,12 +166,14 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
       setOpenSnackBar(true);
     } else {
       setIsSaving(true);
-      const completeWorkout = generateWorkoutObj();
+      // Determine if adding new workout or updating
+      const method = editingWorkout ? 'updateWorkout' : 'addWorkout';
+      const workoutToBeSaved = generateWorkoutObj();
       
       // Save workout to Firestore
       try {
-        await firebase.addNewWorkout(completeWorkout);
-        setSnackBarMsg('Successfully saved workout');
+        await firebase[method](workoutToBeSaved);
+        setSnackBarMsg(`Successfully ${editingWorkout ? 'updated' : 'saved'} workout`);
       } catch(e) {
         setSnackBarMsg('Something went wrong with the save');
         console.log(e);

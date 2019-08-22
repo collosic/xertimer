@@ -78,18 +78,27 @@ class Firebase {
     });
   }
 
-  async addNewWorkout(workout) {
-    const currentUser = await this.getCurrentUser();
+  addWorkout(workout) {
+    const { uid } = this.auth.currentUser;
     return this.db.collection('users')
-                  .doc(`${currentUser.uid}`)
+                  .doc(`${uid}`)
                   .collection('workouts')
                   .add({
-      title: workout.title,
-      numberOfCyles: workout.numberOfCycles,
-      numberOfSets: workout.numberOfSets,
-      timerLength: workout.timerLength,
-      sets: workout.allSets
-    });
+                    title: workout.title,
+                    numberOfCyles: workout.numberOfCycles,
+                    numberOfSets: workout.numberOfSets,
+                    timerLength: workout.timerLength,
+                    sets: workout.allSets
+                  });
+  }
+
+  updateWorkout(id, data) {
+    const { uid } = this.auth.currentUser;
+    return this.db.collection('users')
+                  .doc(`${uid}`)
+                  .collection('workouts')
+                  .doc(id)
+                  .update(data);
   }
 
   deleteWorkout(docId) {
