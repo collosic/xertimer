@@ -67,27 +67,27 @@ const types = [
 ];
 
 // Initial State
-const initCreateCardState = {
-  uuid: null,
-  type: '',
-  title: '',
-  numberOfRepsNoTimer: 0,
-  minutes: 0,
-  seconds: 0,
-  x_repeat: false,
-  x_numberOfRepetitions: 0,
-  x_addRestToAllRepetitions: false,
-  x_restMinutes: 0,
-  x_restSeconds: 0
-};
+const initCreateCardState = () => {
+return {
+    uuid: uuid.v4(),
+    type: '',
+    title: '',
+    numberOfRepsNoTimer: 0,
+    minutes: 0,
+    seconds: 0,
+    x_repeat: false,
+    x_numberOfRepetitions: 0,
+    x_addRestToAllRepetitions: false,
+    x_restMinutes: 0,
+    x_restSeconds: 0
+  };
+}
 
 // Reducers
 const createCardReducer = (state, action) => {
   switch (action.type) {
     case 'RESET_STATE':
-      return { ...initCreateCardState };
-    case 'INIT_UUID':
-      return { ...state, uuid: uuid.v4() }
+      return initCreateCardState();
     case 'LOAD':
       return { ...action.value }
     case 'TYPE':
@@ -125,14 +125,14 @@ const createCardReducer = (state, action) => {
 const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
   const [createCard, createCardDispatch] = useReducer(
     createCardReducer,
-    initCreateCardState
+    initCreateCardState()
   );
   const newWorkoutContext = useContext(CurrentWorkout);
   const [isOpen, setIsOpen] = useState(true);
   const [errors, setErrors] = useState(null);
   const classes = useStyles();
 
-  
+  // Load up 
 
   const getDetailsOfType = () => {
     switch (createCard.type) {
@@ -172,7 +172,7 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
             seconds: createCard.seconds
           };
     });
-    newWorkoutContext.dispatch({ type: 'ADJUST', value: totalWorkout });
+    newWorkoutContext.dispatch({ type: 'OVERRIDE', value: totalWorkout });
   };
 
   const handleNext = () => {
@@ -197,12 +197,20 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
       createCard.x_restSeconds === 0
     ) {
       setErrors({ x_restSeconds: 'Must have a value greater than 0' });
-    } else if (isEditModeOn) {
+      return false;
+    } 
+    
+    if (createCard.x_repeat && createCard.x_numberOfRepetitions === 0) {
+      setErrors({ x_numberOfRepetitions: 'Must have a value greater than 0' });
+      return false;
+    } 
+    
+    if (isEditModeOn) {
       // Add in the changes to the edited set in the array
-      const newCurrentWorkout = newWorkoutContext.state.map(set => {
+      const newCurrentWorkout = newWorkoutContext.state.sets.map(set => {
         return set.uuid === createCard.uuid ? { ...createCard } : set
       })
-      newWorkoutContext.dispatch({ type: 'ADJUST', value: newCurrentWorkout })
+      newWorkoutContext.dispatch({ type: 'OVERRIDE', value: newCurrentWorkout })
       setIsOpen(false);
       handleClose();
     } else if (createCard.x_repeat) {
@@ -232,16 +240,14 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
 
   useEffect(() => {
     const loadExistingSet = () => {
-      const currentCard = newWorkoutContext.state.filter(set => set.uuid === id && set)[0];
+      const currentCard = newWorkoutContext.state.sets.filter(set => set.uuid === id && set)[0];
       createCardDispatch({ type: 'LOAD', value: currentCard });
     }
 
     if(isEditModeOn) {
       loadExistingSet();
-    } else {
-      createCardDispatch({type: 'INIT_UUID'});
-    }
-  }, [isEditModeOn, newWorkoutContext.state, id])
+    } 
+  }, [isEditModeOn, newWorkoutContext.state.sets, id])
 
   return (
     <>
@@ -385,7 +391,7 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
               <Grid item xs={12} sm={6}>
                 <FormControlLabel
                   disabled={!createCard.type || createCard.type === 'REST' || isEditModeOn}
-                  control={
+                  control={(
                     <Checkbox
                       color="secondary"
                       name="REPEAT"
@@ -398,7 +404,7 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
                         })
                       }
                     />
-                  }
+                  )}
                   label="Repeat exercise"
                 />
               </Grid>
@@ -409,6 +415,8 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
                   label="Number of repetitions"
                   type="number"
                   value={createCard.x_numberOfRepetitions}
+                  error={!!(errors && errors.x_numberOfRepetitions)}
+                  helperText={errors && errors.x_numberOfRepetitions}
                   onChange={e =>
                     createCardDispatch({
                       type: 'NUM_OF_REPETITIONS',
@@ -425,7 +433,7 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
                 <FormControlLabel
                   id="add-rest-period"
                   disabled={!createCard.x_repeat}
-                  control={
+                  control={(
                     <Checkbox
                       color="secondary"
                       name="addRestToAllRepetitions"
@@ -438,7 +446,7 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
                         })
                       }
                     />
-                  }
+                  )}
                   label="Add rest period between all exercises"
                 />
                 <FormHelperText id="add-rest-period">
@@ -519,4 +527,4 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
   );
 };
 
-export default CreateSetDialog;
+export default React.memo(CreateSetDialog);

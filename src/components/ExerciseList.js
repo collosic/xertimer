@@ -44,15 +44,15 @@ const ExerciseList = ({ onEdit }) => {
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
     currentWorkoutContext.dispatch({
-      type: 'ADJUST',
-      value: arrayMove(currentWorkoutContext.state, oldIndex, newIndex),
+      type: 'OVERRIDE',
+      value: arrayMove(currentWorkoutContext.state.sets, oldIndex, newIndex),
     });
   };
 
   const handleDelete = uuid => {
     currentWorkoutContext.dispatch({
-      type: 'ADJUST',
-      value: currentWorkoutContext.state.filter(sets => sets.uuid !== uuid),
+      type: 'OVERRIDE',
+      value: currentWorkoutContext.state.sets.filter(sets => sets.uuid !== uuid),
     });
   };
 
@@ -112,12 +112,12 @@ const ExerciseList = ({ onEdit }) => {
             )}
           />
           <ListItemSecondaryAction>
-            <Tooltip title='Edit'>
+            <Tooltip title='Edit' enterDelay={400}>
               <IconButton onClick={() => handleEdit(uuid)} edge='start' aria-label='edit'>
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title='Delete'>
+            <Tooltip title='Delete' enterDelay={400}>
               <IconButton
                 onClick={() => handleDelete(uuid)}
                 color='secondary'
@@ -139,11 +139,11 @@ const ExerciseList = ({ onEdit }) => {
 
   return (
     <SortableContainer onSortEnd={onSortEnd} useDragHandle>
-      {currentWorkoutContext.state.map((value, index) => (
+      {currentWorkoutContext.state && currentWorkoutContext.state.sets.map((value, index) => (
         <SortableItem key={`item-${value.uuid}`} index={index} value={value} />
       ))}
     </SortableContainer>
   );
 };
 
-export default ExerciseList;
+export default React.memo(ExerciseList);

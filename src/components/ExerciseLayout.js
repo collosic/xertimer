@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Tooltip,
@@ -26,8 +26,6 @@ import firebase from './Firebase';
 
 // Contexts
 import { CurrentWorkout, AllWorkouts } from '../store/Store';
-import { LocalConvenienceStoreOutlined } from '@material-ui/icons';
-
 
 // Styles
 const useStyles = makeStyles(theme => ({
@@ -63,7 +61,7 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     paddingBottom: 64,
     [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      height: '90%',
+      height: '100%',
       marginTop: theme.spacing(6),
       marginBottom: theme.spacing(6),
       padding: theme.spacing(3),
@@ -94,65 +92,73 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ExerciseLayout = ({ onBack }) => {
+const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isBackButtonDialogOpen, setIsBackButtonDialogOpen] = useState(false);
   const [editModeOn, setEditModeOn] = useState(false);
+  const [snackBarMsg, setSnackBarMsg] = useState('');
   const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [workoutName, setWorkoutName] = useState('');
-  const [errors, setErrors] = useState(null);
+  const [workoutTitle, setWorkoutTitle] = useState('');
   const [id, setId] = useState(null);
   const [totalTime, setTotalTime] = useState({min: 0, sec: 0})
   const [isSaving, setIsSaving] = useState(false);
 
   // Global States
-  const currentWorkoutContext = useContext(CurrentWorkout);
+  const currentWorkout = useContext(CurrentWorkout);
   const allWorkouts = useContext(AllWorkouts);
 
+  // Helper Functions
   const generateWorkoutObj = () => {
     return {
-      title: workoutName,
-      allSets: [...currentWorkoutContext.state],
-      numberOfSets: currentWorkoutContext.state.filter(set => set.type !== 'REST').length,
+      title: workoutTitle,
+      allSets: [...currentWorkout.state.sets],
+      numberOfSets: currentWorkout.state.sets.filter(set => set.type !== 'REST').length,
       timerLength: { ...totalTime },
       numberOfCycles: 0,
     }
-  }
-
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true);
   };
+
+  const setTotalTimeFunc = useCallback(() => {
+    // Extract the total minutes and seconds from the Workout Context
+    const totalMin = currentWorkout.state.sets.reduce((total, set) => total + set.minutes, 0);
+    const totalSec = currentWorkout.state.sets.reduce((total, set) => total + set.seconds, 0);
+    // Convert seconds into minutes leaving the remainder seconds as is
+    const adjustedMin = totalMin + Math.floor(totalSec % 3600 / 60);
+    const adjustedSec = Math.floor(totalSec % 3600 % 60);
+    setTotalTime({min: adjustedMin, sec: adjustedSec})
+  }, [currentWorkout.state.sets]);
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditModeOn(false);
+    setTotalTimeFunc();
   };
 
-  const handleEdit = (id) => {
+  const handleEdit = useCallback((uid) => {
     setIsDialogOpen(true);
     setEditModeOn(true);
-    setId(id);
-  }
+    setId(uid);
+  }, []);
 
   const handleBack = () => {
-    if (currentWorkoutContext.state.length > 0) {
+    if (currentWorkout.state.sets.length > 0) {
       setIsBackButtonDialogOpen(true);
     } else {
       onBack();
     }
-  }
+  };
 
   const handleChange = (e) => {
-    setWorkoutName(e.target.value);
-  }
+    setWorkoutTitle(e.target.value);
+  };
 
   const handleSave = async () => {
     // Check to see if user added name for the workout
-    if (workoutName === '') {
-      setErrors({ message: 'Must provide a title for the workout' });
+    if (workoutTitle === '') {
+      setSnackBarMsg('Must provide a title for the workout');
       setOpenSnackBar(true);
-    } else if (currentWorkoutContext.state.length === 0) {
-      setErrors({ message: 'Must add at least one exercise' });
+    } else if (currentWorkout.state.sets.length === 0) {
+      setSnackBarMsg('Must add at least one exercise' )
       setOpenSnackBar(true);
     } else {
       setIsSaving(true);
@@ -161,36 +167,35 @@ const ExerciseLayout = ({ onBack }) => {
       // Save workout to Firestore
       try {
         await firebase.addNewWorkout(completeWorkout);
-        // clear currentWorkoutContext
-        
+        setSnackBarMsg('Successfully saved workout');
       } catch(e) {
+        setSnackBarMsg('Something went wrong with the save');
         console.log(e);
       }   
       setIsSaving(false);
+      setOpenSnackBar(true);
       onBack();
     }
-  }
+  };
 
   const handleCloseSnackBar = () => {
     setOpenSnackBar(false);
-  }
+  };
 
   const classes = useStyles();
 
   useEffect(() => {
-    //console.log('Component Did Mount')
-    const setTotalTimeFunc = () => {
-      // Extract the total minutes and seconds from the Workout Context
-      const totalMin = currentWorkoutContext.state.reduce((total, set) => total + set.minutes, 0);
-      const totalSec = currentWorkoutContext.state.reduce((total, set) => total + set.seconds, 0);
-      // Convert seconds into minutes leaving the remainder seconds as is
-      const adjustedMin = totalMin + Math.floor(totalSec % 3600 / 60);
-      const adjustedSec = Math.floor(totalSec % 3600 % 60);
-      setTotalTime({min: adjustedMin, sec: adjustedSec})
-    }
-
     setTotalTimeFunc();
-  }, [currentWorkoutContext])
+  }, [setTotalTimeFunc])
+
+  useEffect(() => {
+    if (editingWorkout) {
+      const extractedWorkout = allWorkouts.state.find(workout => workout.id === workoutId);
+      currentWorkout.dispatch({ type: 'OVERRIDE', value: extractedWorkout.workout.sets})
+      setTotalTime(extractedWorkout.workout.timerLength)
+      setWorkoutTitle(extractedWorkout.workout.title)
+    }
+  }, []);
 
   return (
     <div className={classes.container}>
@@ -198,7 +203,7 @@ const ExerciseLayout = ({ onBack }) => {
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <div className={classes.subHeader}>
-            <Tooltip title='Back'>
+            <Tooltip title='Back' enterDelay={400}>
               <IconButton onClick={() => handleBack()}>
                 <Icon>arrow_back</Icon>
               </IconButton>
@@ -206,16 +211,15 @@ const ExerciseLayout = ({ onBack }) => {
             <InputBase
               className={classes.subHeaderText}
               autoFocus
-              error={!!(errors && errors.workoutName)}
               placeholder='e.g. Leg Day'
-              value={workoutName}
+              value={workoutTitle}
               onChange={handleChange}
               inputProps={{
                 'aria-label': 'workout title',
                 style: { textAlign: 'center' },
               }}
             />
-            <Tooltip title='Save'>
+            <Tooltip title='Save' enterDelay={400}>
               <IconButton onClick={() => handleSave()} color='primary'>
                 <Icon>save_alt</Icon>
               </IconButton>
@@ -234,12 +238,12 @@ const ExerciseLayout = ({ onBack }) => {
           <ExerciseList onEdit={handleEdit} />
         </Paper>
       </main>
-      <Tooltip title='Add'>
+      <Tooltip title='Add' enterDelay={400}>
         <Fab
           color='primary'
           aria-label='add'
           className={classes.fab}
-          onClick={() => handleOpenDialog()}
+          onClick={() => setIsDialogOpen(true)}
         >
           <AddIcon />
         </Fab>
@@ -265,7 +269,7 @@ const ExerciseLayout = ({ onBack }) => {
         />
       )}
       {openSnackBar && (
-        <CustomSnackBar message={errors.message} onClose={handleCloseSnackBar} />
+        <CustomSnackBar message={snackBarMsg} onClose={handleCloseSnackBar} />
       )}
       {isSaving && (
         <Spinner />

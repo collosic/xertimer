@@ -29,16 +29,15 @@ class Firebase {
     return this.auth.signOut();
   }
 
-  async createAccount(email, password) {
-    
+  createAccount(email, password) {
     return this.auth.createUserWithEmailAndPassword(email, password);
   }
 
-  async signInWithProvider(provider) {    
+  signInWithProvider(provider) {    
     return this.auth.signInWithPopup(provider);
   }
 
-  async signInAnonymously() {
+  signInAnonymously() {
     return this.auth.signInAnonymously();
   }
 
@@ -93,19 +92,19 @@ class Firebase {
     });
   }
 
-  async deleteWorkout(docId) {
-    const currentUser = await this.getCurrentUser();
+  deleteWorkout(docId) {
+    const { uid } = this.auth.currentUser;
     return this.db.collection('users')
-                  .doc(`${currentUser.uid}`)
-                  .collection('workouts')
-                  .doc(docId)
-                  .delete();
+      .doc(`${uid}`)
+      .collection('workouts')
+      .doc(docId)
+      .delete();
   }
 
-  async getWorkouts() {
-    const currentUser = await this.getCurrentUser();
+  getWorkouts() {
+    const { uid } = this.auth.currentUser;
     return this.db.collection('users')
-      .doc(`${currentUser.uid}`).collection('workouts')
+      .doc(`${uid}`).collection('workouts')
         .get()
   }
 

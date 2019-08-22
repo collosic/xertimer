@@ -3,10 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
 import ExerciseLayout from '../components/ExerciseLayout';
+import CustomSnackBar from '../components/CustomSnackBar';
 
 // Xertimer context
-import { CurrentWorkout } from '../store/Store';
-import { AllWorkouts } from '../store/Store';
+import { CurrentWorkout, AllWorkouts } from '../store/Store';
 
 // Styles
 const useStyles = makeStyles(() => ({
@@ -19,32 +19,63 @@ const useStyles = makeStyles(() => ({
 
 // Component
 const Xertimer = () => {
-  const currentWorkout = useContext(CurrentWorkout)
-  const [isCreateSetFormOpen, setIsCreateSetFormOpen] = useState(false);
+  const [isExerciseLayoutOpen, setIsExerciseLayoutOpen] = useState(false);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [snackBarMsg, setSnackBarMsg] = useState('');
+  const [editWorkout, setEditWorkout] = useState(false);
+  const [workoutId, setWorkoutId] = useState(null);
   const classes = useStyles();
 
-  const openCreateSetForm = () => {
+  // Global States
+  const currentWorkout = useContext(CurrentWorkout);
+  const allWorkouts = useContext(AllWorkouts);
+
+  const openCreateWorkout = () => {
     currentWorkout.dispatch({ type: 'RESET_STATE' });
-    setIsCreateSetFormOpen(true);
+    setIsExerciseLayoutOpen(true);
   };
 
-  const closeCreateSetForm = () => {
-    setIsCreateSetFormOpen(false);
+  const openEditWorkout = (id) => {
+    // Load in the workout sets into current workout context
+    const extractedWorkout = allWorkouts.state.find(workout => workout.id === id);
+    const modifiedWorkout = { workoutId: id, sets: [...extractedWorkout.workout.sets] };
+    currentWorkout.dispatch({ type: 'EDIT_MODE_OVERRIDE', value: modifiedWorkout })
+    setWorkoutId(id);
+    setIsExerciseLayoutOpen(true);
+    setEditWorkout(true);
+  }
+
+  const closeExerciseLayout= () => {
+    setIsExerciseLayoutOpen(false);
+    setEditWorkout(false);
   };
 
   const getView = () =>
-    isCreateSetFormOpen ? (
-      <ExerciseLayout onBack={closeCreateSetForm} />
+    isExerciseLayoutOpen ? (
+      <ExerciseLayout
+        workoutId={workoutId}
+        editingWorkout={editWorkout}
+        onBack={closeExerciseLayout} 
+        setSnackBarMsg={setSnackBarMsg}
+        openSnackBar={() => setOpenSnackBar(true)} />
     ) : (
       <XertimerMain
-        onCreateSetClick={openCreateSetForm}
+        onEditWorkoutClick={openEditWorkout}
+        onCreateSetClick={openCreateWorkout}
+        setSnackBarMsg={setSnackBarMsg}
+        openSnackBar={() => setOpenSnackBar(true)}
       />
     );
+
+  
 
   return (
     <div className={classes.container}>
       <Layout />
       {getView()}
+      {openSnackBar && (
+        <CustomSnackBar message={snackBarMsg} onClose={() => setOpenSnackBar(false)} />
+      )}
     </div>
   );
 };

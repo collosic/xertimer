@@ -1,7 +1,10 @@
 import React, { useReducer } from 'react';
 
 // Initial States
-const initCurrentWorkout = [];
+const initCurrentWorkout = {
+  workoutId: null,
+  sets: [],
+};
 
 const initAllWorkouts = [];
 
@@ -15,11 +18,13 @@ const currentWorkoutReducer = (state, action) => {
     case 'RESET_STATE':
       return initCurrentWorkout;
     case 'ADD':
-      return [...state, action.value];
+      return {...state, sets: [...state.sets, action.value]};
     case 'DELETE':
-      return [...state];
-    case 'ADJUST':
-      return [...action.value];
+      return {...state};
+    case 'OVERRIDE':
+      return {...state, sets: action.value };
+    case 'EDIT_MODE_OVERRIDE':
+      return {...action.value }
     default:
       break;
   }
