@@ -6,7 +6,7 @@ import ExerciseLayout from '../components/ExerciseLayout';
 import CustomSnackBar from '../components/CustomSnackBar';
 
 // Xertimer context
-import { CurrentWorkout, AllWorkouts } from '../store/Store';
+import { CurrentWorkout } from '../store/Store';
 
 // Styles
 const useStyles = makeStyles(() => ({
@@ -19,6 +19,7 @@ const useStyles = makeStyles(() => ({
 
 // Component
 const Xertimer = () => {
+  console.log('Xertimer');
   const [isExerciseLayoutOpen, setIsExerciseLayoutOpen] = useState(false);
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [snackBarMsg, setSnackBarMsg] = useState('');
@@ -28,24 +29,19 @@ const Xertimer = () => {
 
   // Global States
   const currentWorkout = useContext(CurrentWorkout);
-  const allWorkouts = useContext(AllWorkouts);
 
   const openCreateWorkout = () => {
     currentWorkout.dispatch({ type: 'RESET_STATE' });
     setIsExerciseLayoutOpen(true);
   };
 
-  const openEditWorkout = (id) => {
-    // Load in the workout sets into current workout context
-    const extractedWorkout = allWorkouts.state.find(workout => workout.id === id);
-    const modifiedWorkout = { workoutId: id, sets: [...extractedWorkout.workout.sets] };
-    currentWorkout.dispatch({ type: 'EDIT_MODE_OVERRIDE', value: modifiedWorkout })
+  const openEditWorkout = id => {
     setWorkoutId(id);
     setIsExerciseLayoutOpen(true);
     setEditWorkout(true);
-  }
+  };
 
-  const closeExerciseLayout= () => {
+  const closeExerciseLayout = () => {
     setIsExerciseLayoutOpen(false);
     setEditWorkout(false);
   };
@@ -54,10 +50,11 @@ const Xertimer = () => {
     isExerciseLayoutOpen ? (
       <ExerciseLayout
         workoutId={workoutId}
-        editingWorkout={editWorkout}
-        onBack={closeExerciseLayout} 
+        editingExistingWorkout={editWorkout}
+        onBack={closeExerciseLayout}
         setSnackBarMsg={setSnackBarMsg}
-        openSnackBar={() => setOpenSnackBar(true)} />
+        openSnackBar={() => setOpenSnackBar(true)}
+      />
     ) : (
       <XertimerMain
         onEditWorkoutClick={openEditWorkout}
@@ -67,14 +64,15 @@ const Xertimer = () => {
       />
     );
 
-  
-
   return (
     <div className={classes.container}>
       <Layout />
       {getView()}
       {openSnackBar && (
-        <CustomSnackBar message={snackBarMsg} onClose={() => setOpenSnackBar(false)} />
+        <CustomSnackBar
+          message={snackBarMsg}
+          onClose={() => setOpenSnackBar(false)}
+        />
       )}
     </div>
   );

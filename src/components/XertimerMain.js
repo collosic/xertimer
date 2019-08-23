@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -14,7 +14,6 @@ import { PlayArrow, Edit, Delete } from '@material-ui/icons';
 
 // Custom Components
 import DeleteWorkoutDialog from '../dialogs/DeleteWorkoutDialog';
-import ExerciseLayout from './ExerciseLayout';
 
 import firebase from './Firebase';
 
@@ -37,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: '20px',
     padding: '20px',
     [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-      padding: '20px 50px'
+      padding: '20px 50px',
     },
   },
   icon: {
@@ -59,8 +58,9 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     color: '#3c3c3c',
-    background: 'linear-gradient(to bottom, #D5DEE7 0%, #E8EBF2 50%, #E2E7ED 100%), linear-gradient(to bottom, rgba(0,0,0,0.02) 50%, rgba(255,255,255,0.02) 61%, rgba(0,0,0,0.02) 73%), linear-gradient(33deg, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0.20) 100%)',
-    backgroundBlendMode: 'normal,color-burn'
+    background:
+      'linear-gradient(to bottom, #D5DEE7 0%, #E8EBF2 50%, #E2E7ED 100%), linear-gradient(to bottom, rgba(0,0,0,0.02) 50%, rgba(255,255,255,0.02) 61%, rgba(0,0,0,0.02) 73%), linear-gradient(33deg, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0.20) 100%)',
+    backgroundBlendMode: 'normal,color-burn',
   },
   cardMedia: {
     paddingTop: '56.25%', // 16:9
@@ -78,50 +78,56 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const XertimerMain = ({ onEditWorkoutClick, onCreateSetClick, setSnackBarMsg, openSnackBar }) => {
+const XertimerMain = ({
+  onEditWorkoutClick,
+  onCreateSetClick,
+  setSnackBarMsg,
+  openSnackBar,
+}) => {
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentCardId, setCurrentCardId] = useState(null);
-  const allWorkouts = useContext(AllWorkouts)
+  const allWorkouts = useContext(AllWorkouts);
 
   const loadWorkoutsFromFireStore = async () => {
     const workouts = [];
     try {
       const snapShot = await firebase.getWorkouts();
       snapShot.forEach(doc => {
-        workouts.push({ id: doc.id, workout: doc.data() })
-      })
-      allWorkouts.dispatch({ type: 'OVERRIDE', value: workouts })
-    } catch(e) {
+        workouts.push({ id: doc.id, workout: doc.data() });
+      });
+      allWorkouts.dispatch({ type: 'OVERRIDE', value: workouts });
+    } catch (e) {
       console.log(e);
     }
   };
 
-  const openDeleteWorkoutDialog = (id) => {
+  const openDeleteWorkoutDialog = id => {
     setCurrentCardId(id);
     setIsDeleteDialogOpen(true);
-  }
+  };
 
   const deleteWorkout = async () => {
     setIsDeleteDialogOpen(false);
     try {
       await firebase.deleteWorkout(currentCardId);
-      setSnackBarMsg('Successfully deleted workout')
+      setSnackBarMsg('Successfully deleted workout');
       loadWorkoutsFromFireStore();
     } catch (e) {
       setSnackBarMsg('An error occured while attempting to delete workout');
       console.log(e);
     }
     openSnackBar(true);
-  }
+  };
 
-  const handleEdit = (id) => {
+  const handleEdit = id => {
     onEditWorkoutClick(id);
-  }
-  
+  };
+
   const classes = useStyles();
 
   useEffect(() => {
+    // Initialize the user and load in workouts if they exist
     const initCurrentUser = async () => {
       const user = await firebase.getCurrentUser();
       if (user && user.uid) {
@@ -129,6 +135,7 @@ const XertimerMain = ({ onEditWorkoutClick, onCreateSetClick, setSnackBarMsg, op
         loadWorkoutsFromFireStore();
       }
     };
+
     initCurrentUser();
   }, []);
 
@@ -138,18 +145,33 @@ const XertimerMain = ({ onEditWorkoutClick, onCreateSetClick, setSnackBarMsg, op
       <main className={classes.container}>
         {/* Hero unit */}
         <div className={classes.containerContent}>
-          <Container maxWidth="lg">
-            <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
+          <Container maxWidth='lg'>
+            <Typography
+              component='h1'
+              variant='h2'
+              align='center'
+              color='textPrimary'
+              gutterBottom
+            >
               {currentUserInfo && `Welcome ${currentUserInfo.displayName}`}
             </Typography>
-            <Typography variant="h5" align="center" color="textSecondary" paragraph>
-              Begin creating new customized sets for your workouts. You can name and save your sets
-              for future use if desired.
+            <Typography
+              variant='h5'
+              align='center'
+              color='textSecondary'
+              paragraph
+            >
+              Begin creating new customized sets for your workouts. You can name
+              and save your sets for future use if desired.
             </Typography>
             <div className={classes.heroButtons}>
-              <Grid container spacing={2} justify="center">
+              <Grid container spacing={2} justify='center'>
                 <Grid item>
-                  <Button variant="contained" color="primary" onClick={() => onCreateSetClick()}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={() => onCreateSetClick()}
+                  >
                     Create a Set
                   </Button>
                 </Grid>
@@ -157,7 +179,7 @@ const XertimerMain = ({ onEditWorkoutClick, onCreateSetClick, setSnackBarMsg, op
             </div>
           </Container>
         </div>
-        <Container className={classes.cardGrid} maxWidth="lg">
+        <Container className={classes.cardGrid} maxWidth='lg'>
           {/* End hero unit */}
           <Grid container spacing={3}>
             {allWorkouts.state.map(card => (
@@ -169,28 +191,38 @@ const XertimerMain = ({ onEditWorkoutClick, onCreateSetClick, setSnackBarMsg, op
                     title="Image title"
                   /> */}
                   <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant="h5" component="h2">
+                    <Typography gutterBottom variant='h5' component='h2'>
                       {card.workout.title}
                     </Typography>
                     <Typography>{`Sets: ${card.workout.numberOfSets}`}</Typography>
                     <Typography>
                       {`Timer Length: 
-                        ${card.workout.timerLength.min < 10 ? '0' : ''}${card.workout.timerLength.min}:${card.workout.timerLength.sec < 10 ? '0' : ''}${card.workout.timerLength.sec}`}
+                        ${card.workout.timerLength.min < 10 ? '0' : ''}${
+                        card.workout.timerLength.min
+                      }:${card.workout.timerLength.sec < 10 ? '0' : ''}${
+                        card.workout.timerLength.sec
+                      }`}
                     </Typography>
                   </CardContent>
                   <CardActions className={classes.cardButtons}>
-                    <Tooltip title="Start" enterDelay={400}>
-                      <IconButton color="primary">
+                    <Tooltip title='Start' enterDelay={400}>
+                      <IconButton color='primary'>
                         <PlayArrow />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit" enterDelay={400}>
-                      <IconButton onClick={() => handleEdit(card.id)} coloor="primary">
+                    <Tooltip title='Edit' enterDelay={400}>
+                      <IconButton
+                        onClick={() => handleEdit(card.id)}
+                        coloor='primary'
+                      >
                         <Edit />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" enterDelay={400}>
-                      <IconButton onClick={() => openDeleteWorkoutDialog(card.id)} color="secondary">
+                    <Tooltip title='Delete' enterDelay={400}>
+                      <IconButton
+                        onClick={() => openDeleteWorkoutDialog(card.id)}
+                        color='secondary'
+                      >
                         <Delete />
                       </IconButton>
                     </Tooltip>
@@ -200,10 +232,13 @@ const XertimerMain = ({ onEditWorkoutClick, onCreateSetClick, setSnackBarMsg, op
             ))}
           </Grid>
         </Container>
-        {(isDeleteDialogOpen && (
-          <DeleteWorkoutDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} deleteWorkout={deleteWorkout} />
-        ))}
-        
+        {isDeleteDialogOpen && (
+          <DeleteWorkoutDialog
+            open={isDeleteDialogOpen}
+            onClose={() => setIsDeleteDialogOpen(false)}
+            deleteWorkout={deleteWorkout}
+          />
+        )}
       </main>
     </>
   );

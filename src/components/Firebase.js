@@ -21,7 +21,6 @@ class Firebase {
   }
 
   login(email, password) {
-
     return this.auth.signInWithEmailAndPassword(email, password);
   }
 
@@ -33,7 +32,7 @@ class Firebase {
     return this.auth.createUserWithEmailAndPassword(email, password);
   }
 
-  signInWithProvider(provider) {    
+  signInWithProvider(provider) {
     return this.auth.signInWithPopup(provider);
   }
 
@@ -80,30 +79,27 @@ class Firebase {
 
   addWorkout(workout) {
     const { uid } = this.auth.currentUser;
-    return this.db.collection('users')
-                  .doc(`${uid}`)
-                  .collection('workouts')
-                  .add({
-                    title: workout.title,
-                    numberOfCyles: workout.numberOfCycles,
-                    numberOfSets: workout.numberOfSets,
-                    timerLength: workout.timerLength,
-                    sets: workout.allSets
-                  });
+    return this.db
+      .collection('users')
+      .doc(`${uid}`)
+      .collection('workouts')
+      .add(workout);
   }
 
-  updateWorkout(id, data) {
+  updateWorkout(data, id) {
     const { uid } = this.auth.currentUser;
-    return this.db.collection('users')
-                  .doc(`${uid}`)
-                  .collection('workouts')
-                  .doc(id)
-                  .update(data);
+    return this.db
+      .collection('users')
+      .doc(`${uid}`)
+      .collection('workouts')
+      .doc(id)
+      .update(data);
   }
 
   deleteWorkout(docId) {
     const { uid } = this.auth.currentUser;
-    return this.db.collection('users')
+    return this.db
+      .collection('users')
       .doc(`${uid}`)
       .collection('workouts')
       .doc(docId)
@@ -112,25 +108,33 @@ class Firebase {
 
   getWorkouts() {
     const { uid } = this.auth.currentUser;
-    return this.db.collection('users')
-      .doc(`${uid}`).collection('workouts')
-        .get()
+    return this.db
+      .collection('users')
+      .doc(`${uid}`)
+      .collection('workouts')
+      .get();
   }
 
   getData(user) {
-    const docRef = this.db.collection('users').doc(`${user.uid}`).collection('workouts');
+    const docRef = this.db
+      .collection('users')
+      .doc(`${user.uid}`)
+      .collection('workouts');
 
-    docRef.get().then(querySnapShot => {
-      querySnapShot.forEach(doc => {
-        if (doc.exists) {
-          console.log(`${doc.id} => ${doc.data().title}`)
-        } else {
-          console.log('nothing here');
-        }
+    docRef
+      .get()
+      .then(querySnapShot => {
+        querySnapShot.forEach(doc => {
+          if (doc.exists) {
+            console.log(`${doc.id} => ${doc.data().title}`);
+          } else {
+            console.log('nothing here');
+          }
+        });
       })
-    }).catch(error => {
-      console.log(error)
-    })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   isInitialized() {

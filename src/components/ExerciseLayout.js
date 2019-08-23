@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-  Tooltip,
-  InputBase,
-  Hidden,
-  Typography,
-} from '@material-ui/core';
+import { Tooltip, InputBase, Hidden, Typography } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -19,7 +14,7 @@ import CustomSnackBar from './CustomSnackBar';
 import Spinner from './Spinner';
 
 // Dialogs
-import BackButtonDialog from '../dialogs/BackButtonDialog'
+import BackButtonDialog from '../dialogs/BackButtonDialog';
 
 // Firebase Class
 import firebase from './Firebase';
@@ -92,7 +87,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
+const ExerciseLayout = ({ editingExistingWorkout, workoutId, onBack }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isBackButtonDialogOpen, setIsBackButtonDialogOpen] = useState(false);
   const [editModeOn, setEditModeOn] = useState(false);
@@ -100,36 +95,80 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [workoutTitle, setWorkoutTitle] = useState('');
   const [id, setId] = useState(null);
-  const [totalTime, setTotalTime] = useState({min: 0, sec: 0})
+  const [totalTime, setTotalTime] = useState({ min: 0, sec: 0 });
   const [isSaving, setIsSaving] = useState(false);
+  const [existingWorkout, setExistingWorkout] = useState(null);
 
   // Global States
   const currentWorkout = useContext(CurrentWorkout);
   const allWorkouts = useContext(AllWorkouts);
 
   // Helper Functions
-  const generateWorkoutObj = () => {
+  const generateNewWorkoutObj = () => {
     return {
-      title: workoutTitle,
-      allSets: [...currentWorkout.state.sets],
-      numberOfSets: currentWorkout.state.sets.filter(set => set.type !== 'REST').length,
-      timerLength: { ...totalTime },
       numberOfCycles: 0,
-    }
+      numberOfSets: currentWorkout.state.sets.filter(set => set.type !== 'REST')
+        .length,
+      sets: [...currentWorkout.state.sets],
+      timerLength: { ...totalTime },
+      title: workoutTitle,
+    };
   };
 
-  const hasWorkoutChanged = () => {
-    console.log('checking...')
-  }
+  const generateUpdatedWorkoutObj = () => {
+    const modifiedWorkoutObj = generateNewWorkoutObj();
+    let returnObj = {};
+    if (modifiedWorkoutObj.title !== existingWorkout.title) {
+      returnObj.title = modifiedWorkoutObj.title;
+    }
+
+    if (modifiedWorkoutObj.numberOfCycles !== existingWorkout.numberOfCycles) {
+      returnObj.numberOfCycles = modifiedWorkoutObj.numberOfCycles;
+    }
+
+    if (modifiedWorkoutObj.numberOfSets !== existingWorkout.numberOfSets) {
+      returnObj.numberOfSets = modifiedWorkoutObj.numberOfSets;
+    }
+
+    if (
+      JSON.stringify(modifiedWorkoutObj.timerLength) !==
+      JSON.stringify(existingWorkout.timerLength)
+    ) {
+      returnObj.timerLength = { ...modifiedWorkoutObj.timerLength };
+    }
+
+    if (
+      JSON.stringify(modifiedWorkoutObj.sets) !==
+      JSON.stringify(existingWorkout.sets)
+    ) {
+      returnObj.sets = [...modifiedWorkoutObj.sets];
+    }
+
+    return returnObj;
+  };
+
+  const hasExistingWorkoutBeenModified = () => {
+    // Check and see if the workout has been modified
+    return (
+      JSON.stringify(generateNewWorkoutObj()) !==
+      JSON.stringify(existingWorkout)
+    );
+  };
 
   const setTotalTimeFunc = useCallback(() => {
     // Extract the total minutes and seconds from the Workout Context
-    const totalMin = currentWorkout.state.sets.reduce((total, set) => total + set.minutes, 0);
-    const totalSec = currentWorkout.state.sets.reduce((total, set) => total + set.seconds, 0);
+    const totalMin = currentWorkout.state.sets.reduce(
+      (total, set) => total + set.minutes,
+      0,
+    );
+    const totalSec = currentWorkout.state.sets.reduce(
+      (total, set) => total + set.seconds,
+      0,
+    );
     // Convert seconds into minutes leaving the remainder seconds as is
-    const adjustedMin = totalMin + Math.floor(totalSec % 3600 / 60);
-    const adjustedSec = Math.floor(totalSec % 3600 % 60);
-    setTotalTime({min: adjustedMin, sec: adjustedSec})
+    const adjustedMin = totalMin + Math.floor((totalSec % 3600) / 60);
+    const adjustedSec = Math.floor((totalSec % 3600) % 60);
+    setTotalTime({ min: adjustedMin, sec: adjustedSec });
   }, [currentWorkout.state.sets]);
 
   const handleCloseDialog = () => {
@@ -138,21 +177,24 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
     setTotalTimeFunc();
   };
 
-  const handleEdit = useCallback((uid) => {
+  const handleEdit = useCallback(uid => {
     setIsDialogOpen(true);
     setEditModeOn(true);
     setId(uid);
   }, []);
 
-  const handleBack = () => {
-    if (currentWorkout.state.sets.length > 0) {
+  const handleBackArrowButton = () => {
+    if (
+      (!editingExistingWorkout && currentWorkout.state.sets.length > 0) ||
+      (editingExistingWorkout && hasExistingWorkoutBeenModified())
+    ) {
       setIsBackButtonDialogOpen(true);
     } else {
       onBack();
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setWorkoutTitle(e.target.value);
   };
 
@@ -161,27 +203,42 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
     if (workoutTitle === '') {
       setSnackBarMsg('Must provide a title for the workout');
       setOpenSnackBar(true);
-    } else if (currentWorkout.state.sets.length === 0) {
-      setSnackBarMsg('Must add at least one exercise' )
-      setOpenSnackBar(true);
-    } else {
-      setIsSaving(true);
-      // Determine if adding new workout or updating
-      const method = editingWorkout ? 'updateWorkout' : 'addWorkout';
-      const workoutToBeSaved = generateWorkoutObj();
-      
-      // Save workout to Firestore
-      try {
-        await firebase[method](workoutToBeSaved);
-        setSnackBarMsg(`Successfully ${editingWorkout ? 'updated' : 'saved'} workout`);
-      } catch(e) {
-        setSnackBarMsg('Something went wrong with the save');
-        console.log(e);
-      }   
-      setIsSaving(false);
-      setOpenSnackBar(true);
-      onBack();
+      return null;
     }
+
+    if (currentWorkout.state.sets.length === 0) {
+      setSnackBarMsg('Must add at least one exercise');
+      setOpenSnackBar(true);
+      return null;
+    }
+
+    setIsSaving(true);
+    // Determine if adding new workout or updating
+    if (editingExistingWorkout) {
+      if (!hasExistingWorkoutBeenModified()) {
+        setSnackBarMsg("You haven't made any changes");
+        setOpenSnackBar(true);
+        setIsSaving(false);
+        return null;
+      }
+    }
+    const method = editingExistingWorkout ? 'updateWorkout' : 'addWorkout';
+    const workoutToBeSaved = editingExistingWorkout
+      ? generateUpdatedWorkoutObj()
+      : generateNewWorkoutObj();
+    // Save workout to Firestore
+    try {
+      await firebase[method](workoutToBeSaved, workoutId);
+      setSnackBarMsg(
+        `Successfully ${editingExistingWorkout ? 'updated' : 'saved'} workout`,
+      );
+    } catch (e) {
+      setSnackBarMsg('Something went wrong with the save');
+      console.log(e);
+    }
+    setIsSaving(false);
+    setOpenSnackBar(true);
+    onBack();
   };
 
   const handleCloseSnackBar = () => {
@@ -192,14 +249,20 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
 
   useEffect(() => {
     setTotalTimeFunc();
-  }, [setTotalTimeFunc])
+  }, [setTotalTimeFunc]);
 
   useEffect(() => {
-    if (editingWorkout) {
-      const extractedWorkout = allWorkouts.state.find(workout => workout.id === workoutId);
-      currentWorkout.dispatch({ type: 'OVERRIDE', value: extractedWorkout.workout.sets})
-      setTotalTime(extractedWorkout.workout.timerLength)
-      setWorkoutTitle(extractedWorkout.workout.title)
+    if (editingExistingWorkout) {
+      const extractedWorkout = allWorkouts.state.find(
+        workout => workout.id === workoutId,
+      );
+      currentWorkout.dispatch({
+        type: 'OVERRIDE',
+        value: extractedWorkout.workout.sets,
+      });
+      setExistingWorkout({ ...extractedWorkout.workout });
+      setTotalTime(extractedWorkout.workout.timerLength);
+      setWorkoutTitle(extractedWorkout.workout.title);
     }
   }, []);
 
@@ -210,7 +273,7 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
         <Paper className={classes.paper}>
           <div className={classes.subHeader}>
             <Tooltip title='Back' enterDelay={400}>
-              <IconButton onClick={() => handleBack()}>
+              <IconButton onClick={() => handleBackArrowButton()}>
                 <Icon>arrow_back</Icon>
               </IconButton>
             </Tooltip>
@@ -234,11 +297,11 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
           <Divider className={classes.divider} variant='fullWidth' />
           <div className={classes.subMenu}>
             <Typography color='textSecondary'>
-              {`Total Time: ${totalTime.min < 10 ? '0' : ''}${totalTime.min}:${totalTime.sec < 10 ? '0' : ''}${totalTime.sec}`}
+              {`Total Time: ${totalTime.min < 10 ? '0' : ''}${totalTime.min}:${
+                totalTime.sec < 10 ? '0' : ''
+              }${totalTime.sec}`}
             </Typography>
-            <Typography color='textSecondary'>
-              Number of Cycles: 0
-            </Typography>
+            <Typography color='textSecondary'>Number of Cycles: 0</Typography>
           </div>
 
           <ExerciseList onEdit={handleEdit} />
@@ -257,29 +320,36 @@ const ExerciseLayout = ({ editingWorkout, workoutId, onBack }) => {
       {isDialogOpen && (
         <>
           <Hidden only='xs'>
-            <CreateSetDialog handleClose={handleCloseDialog} isEditModeOn={editModeOn} id={id} />
+            <CreateSetDialog
+              handleClose={handleCloseDialog}
+              isEditModeOn={editModeOn}
+              id={id}
+            />
           </Hidden>
           <Hidden only={['sm', 'md', 'lg', 'xl']}>
-            <CreateSetDialog fullScreen handleClose={handleCloseDialog} isEditModeOn={editModeOn} id={id} />
+            <CreateSetDialog
+              fullScreen
+              handleClose={handleCloseDialog}
+              isEditModeOn={editModeOn}
+              id={id}
+            />
           </Hidden>
         </>
       )}
       {isBackButtonDialogOpen && (
-        <BackButtonDialog 
-          open={isBackButtonDialogOpen} 
-          stay={() => setIsBackButtonDialogOpen(false)} 
+        <BackButtonDialog
+          open={isBackButtonDialogOpen}
+          stay={() => setIsBackButtonDialogOpen(false)}
           goBack={() => {
-            setIsBackButtonDialogOpen(false) ;
+            setIsBackButtonDialogOpen(false);
             onBack();
-          }} 
+          }}
         />
       )}
       {openSnackBar && (
         <CustomSnackBar message={snackBarMsg} onClose={handleCloseSnackBar} />
       )}
-      {isSaving && (
-        <Spinner />
-      )}
+      {isSaving && <Spinner />}
     </div>
   );
 };
