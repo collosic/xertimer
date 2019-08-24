@@ -87,7 +87,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ExerciseLayout = ({ editingExistingWorkout, workoutId, onBack }) => {
+const ExerciseLayout = ({
+  editingExistingWorkout,
+  workoutId,
+  onBack,
+  setLoadWorkouts,
+}) => {
+  console.log('Exercise Layout');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isBackButtonDialogOpen, setIsBackButtonDialogOpen] = useState(false);
   const [editModeOn, setEditModeOn] = useState(false);
@@ -232,6 +238,7 @@ const ExerciseLayout = ({ editingExistingWorkout, workoutId, onBack }) => {
       setSnackBarMsg(
         `Successfully ${editingExistingWorkout ? 'updated' : 'saved'} workout`,
       );
+      setLoadWorkouts('LOAD_WORKOUTS');
     } catch (e) {
       setSnackBarMsg('Something went wrong with the save');
       console.log(e);
@@ -354,4 +361,4 @@ const ExerciseLayout = ({ editingExistingWorkout, workoutId, onBack }) => {
   );
 };
 
-export default ExerciseLayout;
+export default React.memo(ExerciseLayout);

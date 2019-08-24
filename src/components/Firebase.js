@@ -45,7 +45,7 @@ class Firebase {
   }
 
   getCurrentUser() {
-    return this.isInitialized();
+    return this.auth.currentUser;
   }
 
   getGoogleProvider() {

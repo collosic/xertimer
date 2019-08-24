@@ -81,9 +81,13 @@ const useStyles = makeStyles(theme => ({
 const XertimerMain = ({
   onEditWorkoutClick,
   onCreateSetClick,
+  loadWorkouts,
+  setLoadWorkouts,
+  startTimer,
   setSnackBarMsg,
   openSnackBar,
 }) => {
+  console.log('Xertimer Main');
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentCardId, setCurrentCardId] = useState(null);
@@ -113,6 +117,7 @@ const XertimerMain = ({
       await firebase.deleteWorkout(currentCardId);
       setSnackBarMsg('Successfully deleted workout');
       loadWorkoutsFromFireStore();
+      setLoadWorkouts('DO_NOT_LOAD_WORKOUTS');
     } catch (e) {
       setSnackBarMsg('An error occured while attempting to delete workout');
       console.log(e);
@@ -129,10 +134,14 @@ const XertimerMain = ({
   useEffect(() => {
     // Initialize the user and load in workouts if they exist
     const initCurrentUser = async () => {
-      const user = await firebase.getCurrentUser();
-      if (user && user.uid) {
+      // THIS NEEDS TO LIVE IN THE STORE
+      const user = !currentUserInfo && (await firebase.getCurrentUser());
+      if (!currentUserInfo && user && user.uid) {
         setCurrentUserInfo(user);
+      }
+      if (user && loadWorkouts) {
         loadWorkoutsFromFireStore();
+        setLoadWorkouts('DO_NOT_LOAD_WORKOUTS');
       }
     };
 
@@ -172,7 +181,7 @@ const XertimerMain = ({
                     color='primary'
                     onClick={() => onCreateSetClick()}
                   >
-                    Create a Set
+                    Create an Exercise
                   </Button>
                 </Grid>
               </Grid>
@@ -206,7 +215,7 @@ const XertimerMain = ({
                   </CardContent>
                   <CardActions className={classes.cardButtons}>
                     <Tooltip title='Start' enterDelay={400}>
-                      <IconButton color='primary'>
+                      <IconButton onClick={() => startTimer()} color='primary'>
                         <PlayArrow />
                       </IconButton>
                     </Tooltip>
@@ -244,4 +253,4 @@ const XertimerMain = ({
   );
 };
 
-export default XertimerMain;
+export default React.memo(XertimerMain);

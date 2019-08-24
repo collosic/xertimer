@@ -1,8 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useReducer, useContext, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
 import ExerciseLayout from '../components/ExerciseLayout';
+import StartWorkout from '../components/StartWorkout';
+
 import CustomSnackBar from '../components/CustomSnackBar';
 
 // Xertimer context
@@ -17,14 +19,58 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+// Init state
+const initState = {
+  currentView: 'START_WORKOUT',
+  editingWorkout: false,
+  workoutId: null,
+  openSnackBar: false,
+  snackBarMsg: '',
+  loadWorkouts: true,
+};
+
+// Reducers
+const stateReducer = (state, action) => {
+  switch (action.type) {
+    case 'OPEN_EXERCISE_LAYOUT':
+      return { ...state, currentView: 'EXERCISE_LAYOUT' };
+    case 'SET_EDITING_WORKOUT':
+      return { ...state, editingWorkout: action.value };
+    case 'SET_WORKOUT_ID':
+      return { ...state, workoutId: action.value };
+    case 'SET_OPEN_SNACKBAR':
+      return { ...state, openSnackBar: action.value };
+    case 'SET_SNACKBAR_MSG':
+      return { ...state, snackBarMsg: action.value };
+
+    case 'OPEN_MAIN':
+      return { ...state, currentView: 'MAIN', editingWorkout: false };
+    case 'OPEN_EDIT_WORKOUT':
+      return {
+        ...state,
+        currentView: 'EXERCISE_LAYOUT',
+        workoutId: action.value,
+        editingWorkout: true,
+      };
+    case 'OPEN_START_WORKOUT':
+      return {
+        ...state,
+        currentView: 'START_WORKOUT',
+        workoutId: action.value,
+      };
+    case 'DO_NOT_LOAD_WORKOUTS':
+      return { ...state, loadWorkouts: false };
+    case 'LOAD_WORKOUTS':
+      return { ...state, loadWorkouts: true };
+    default:
+      return { ...state };
+  }
+};
+
 // Component
 const Xertimer = () => {
   console.log('Xertimer');
-  const [isExerciseLayoutOpen, setIsExerciseLayoutOpen] = useState(false);
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [snackBarMsg, setSnackBarMsg] = useState('');
-  const [editWorkout, setEditWorkout] = useState(false);
-  const [workoutId, setWorkoutId] = useState(null);
+  const [state, dispatch] = useReducer(stateReducer, initState);
   const classes = useStyles();
 
   // Global States
@@ -32,46 +78,69 @@ const Xertimer = () => {
 
   const openCreateWorkout = () => {
     currentWorkout.dispatch({ type: 'RESET_STATE' });
-    setIsExerciseLayoutOpen(true);
+    dispatch({ type: 'OPEN_EXERCISE_LAYOUT' });
   };
 
   const openEditWorkout = id => {
-    setWorkoutId(id);
-    setIsExerciseLayoutOpen(true);
-    setEditWorkout(true);
+    dispatch({ type: 'OPEN_EDIT_WORKOUT', value: id });
   };
 
   const closeExerciseLayout = () => {
-    setIsExerciseLayoutOpen(false);
-    setEditWorkout(false);
+    dispatch({ type: 'OPEN_MAIN' });
   };
 
-  const getView = () =>
-    isExerciseLayoutOpen ? (
-      <ExerciseLayout
-        workoutId={workoutId}
-        editingExistingWorkout={editWorkout}
-        onBack={closeExerciseLayout}
-        setSnackBarMsg={setSnackBarMsg}
-        openSnackBar={() => setOpenSnackBar(true)}
-      />
-    ) : (
-      <XertimerMain
-        onEditWorkoutClick={openEditWorkout}
-        onCreateSetClick={openCreateWorkout}
-        setSnackBarMsg={setSnackBarMsg}
-        openSnackBar={() => setOpenSnackBar(true)}
-      />
-    );
+  const openStartTimer = id => {
+    dispatch({ type: 'OPEN_START_WORKOUT', value: id });
+  };
+
+  const getView = () => {
+    switch (state.currentView) {
+      case 'MAIN':
+        return (
+          <XertimerMain
+            onEditWorkoutClick={openEditWorkout}
+            onCreateSetClick={openCreateWorkout}
+            loadWorkouts={state.loadWorkouts}
+            setLoadWorkouts={type => dispatch({ type })}
+            startTimer={() => openStartTimer()}
+            setSnackBarMsg={msg =>
+              dispatch({ type: 'SET_SNACKBAR_MSG', value: msg })
+            }
+            openSnackBar={() =>
+              dispatch({ type: 'SET_OPEN_SNACKBAR', value: true })
+            }
+          />
+        );
+      case 'EXERCISE_LAYOUT':
+        return (
+          <ExerciseLayout
+            workoutId={state.workoutId}
+            editingExistingWorkout={state.editingWorkout}
+            onBack={closeExerciseLayout}
+            setLoadWorkouts={type => dispatch({ type })}
+            setSnackBarMsg={msg =>
+              dispatch({ type: 'SET_SNACKBAR_MSG', value: msg })
+            }
+            openSnackBar={() =>
+              dispatch({ type: 'SET_OPEN_SNACKBAR', value: true })
+            }
+          />
+        );
+      case 'START_WORKOUT':
+        return <StartWorkout />;
+      default:
+        return '';
+    }
+  };
 
   return (
     <div className={classes.container}>
       <Layout />
       {getView()}
-      {openSnackBar && (
+      {state.openSnackBar && (
         <CustomSnackBar
-          message={snackBarMsg}
-          onClose={() => setOpenSnackBar(false)}
+          message={state.snackBarMsg}
+          onClose={() => dispatch({ type: 'SET_OPEN_SNACKBAR', value: true })}
         />
       )}
     </div>
