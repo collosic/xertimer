@@ -87,7 +87,6 @@ const XertimerMain = ({
   setSnackBarMsg,
   openSnackBar,
 }) => {
-  console.log('Xertimer Main');
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentCardId, setCurrentCardId] = useState(null);
@@ -194,11 +193,6 @@ const XertimerMain = ({
             {allWorkouts.state.map(card => (
               <Grid item key={card.id} xs={12} sm={6} md={4} lg={3}>
                 <Card className={classes.card}>
-                  {/* <CardMedia
-                    className={classes.cardMedia}
-                    image="https://source.unsplash.com/random"
-                    title="Image title"
-                  /> */}
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant='h5' component='h2'>
                       {card.workout.title}
@@ -215,7 +209,7 @@ const XertimerMain = ({
                   </CardContent>
                   <CardActions className={classes.cardButtons}>
                     <Tooltip title='Start' enterDelay={400}>
-                      <IconButton onClick={() => startTimer()} color='primary'>
+                      <IconButton onClick={() => startTimer(card.id)} color='primary'>
                         <PlayArrow />
                       </IconButton>
                     </Tooltip>

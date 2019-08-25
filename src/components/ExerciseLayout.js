@@ -93,7 +93,6 @@ const ExerciseLayout = ({
   onBack,
   setLoadWorkouts,
 }) => {
-  console.log('Exercise Layout');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isBackButtonDialogOpen, setIsBackButtonDialogOpen] = useState(false);
   const [editModeOn, setEditModeOn] = useState(false);

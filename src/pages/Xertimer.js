@@ -1,4 +1,4 @@
-import React, { useReducer, useContext, useMemo } from 'react';
+import React, { useReducer, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
@@ -8,7 +8,7 @@ import StartWorkout from '../components/StartWorkout';
 import CustomSnackBar from '../components/CustomSnackBar';
 
 // Xertimer context
-import { CurrentWorkout } from '../store/Store';
+import { CurrentWorkout, AllWorkouts } from '../store/Store';
 
 // Styles
 const useStyles = makeStyles(() => ({
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 
 // Init state
 const initState = {
-  currentView: 'START_WORKOUT',
+  currentView: 'MAIN',
   editingWorkout: false,
   workoutId: null,
   openSnackBar: false,
@@ -69,12 +69,12 @@ const stateReducer = (state, action) => {
 
 // Component
 const Xertimer = () => {
-  console.log('Xertimer');
   const [state, dispatch] = useReducer(stateReducer, initState);
   const classes = useStyles();
 
   // Global States
   const currentWorkout = useContext(CurrentWorkout);
+  const allWorkouts = useContext(AllWorkouts);
 
   const openCreateWorkout = () => {
     currentWorkout.dispatch({ type: 'RESET_STATE' });
@@ -85,11 +85,18 @@ const Xertimer = () => {
     dispatch({ type: 'OPEN_EDIT_WORKOUT', value: id });
   };
 
-  const closeExerciseLayout = () => {
+  const openMain = () => {
     dispatch({ type: 'OPEN_MAIN' });
   };
 
   const openStartTimer = id => {
+    const extractedWorkout = allWorkouts.state.find(
+      workout => workout.id === id,
+    );
+    currentWorkout.dispatch({
+      type: 'OVERRIDE',
+      value: extractedWorkout.workout.sets,
+    });
     dispatch({ type: 'OPEN_START_WORKOUT', value: id });
   };
 
@@ -102,7 +109,7 @@ const Xertimer = () => {
             onCreateSetClick={openCreateWorkout}
             loadWorkouts={state.loadWorkouts}
             setLoadWorkouts={type => dispatch({ type })}
-            startTimer={() => openStartTimer()}
+            startTimer={openStartTimer}
             setSnackBarMsg={msg =>
               dispatch({ type: 'SET_SNACKBAR_MSG', value: msg })
             }
@@ -116,7 +123,7 @@ const Xertimer = () => {
           <ExerciseLayout
             workoutId={state.workoutId}
             editingExistingWorkout={state.editingWorkout}
-            onBack={closeExerciseLayout}
+            onBack={openMain}
             setLoadWorkouts={type => dispatch({ type })}
             setSnackBarMsg={msg =>
               dispatch({ type: 'SET_SNACKBAR_MSG', value: msg })
@@ -127,7 +134,7 @@ const Xertimer = () => {
           />
         );
       case 'START_WORKOUT':
-        return <StartWorkout />;
+        return <StartWorkout goBack={openMain} />;
       default:
         return '';
     }
