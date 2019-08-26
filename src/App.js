@@ -11,8 +11,7 @@ import Spinner from './components/Spinner';
 import firebase from './components/Firebase';
 
 // Xertimer context
-import { CurrentWorkoutProvider } from './store/Store';
-import { AllWorkoutsProvider } from './store/Store';
+import { CurrentWorkoutProvider, AllWorkoutsProvider} from './store/Store';
 
 let theme = createMuiTheme({
   palette: {

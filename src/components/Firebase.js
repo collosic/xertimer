@@ -4,12 +4,12 @@ import 'firebase/firebase-firestore';
 
 // Configure Firebase.
 const config = {
-  apiKey: process.env.REACT_APP_API_KEY,
-  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_DATABASE_URL,
-  projectId: process.env.REACT_APP_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  apiKey: 'AIzaSyDgLFo6uZn2_bSo5mH6dX8qG5poRgI2csI',
+  authDomain: 'xertimer.firebaseapp.com',
+  databaseURL: 'https://xertimer.firebaseio.com',
+  projectId: 'xertimer',
+  storageBucket: 'xertimer.appspot.com',
+  messagingSenderId: '978335482846',
 };
 
 class Firebase {

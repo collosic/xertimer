@@ -115,7 +115,6 @@ const Login = (props) => {
     async function signInUser({ emailAddress, password }) {
       try {
         await firebase.login(emailAddress, password);
-        debugger;
         setAuthenticating(false);
         props.history.replace('/Xertimer');
       } catch (error) {
@@ -327,14 +326,14 @@ const Login = (props) => {
         </DialogActions>
       </div>
       {isResetPassDialogOpen && (
-        <React.Fragment>
+        <>
           <Hidden only="xs">
             <ResetPassword onClose={closeResetPassDialog} onEmailSent={openSnackBar} />
           </Hidden>
           <Hidden only={['sm', 'md', 'lg', 'xl']}>
             <ResetPassword fullScreen onClose={closeResetPassDialog} onEmailSent={openSnackBar} />
           </Hidden>
-        </React.Fragment>
+        </>
       )}
       {isAuthenticating && <Spinner />}
       {isSnackBarOpen && <CustomSnackBar message="Email sent successfully" />}
