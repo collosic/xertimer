@@ -6,7 +6,7 @@ import moment from 'moment';
 
 import FontSizeSlider from './FontSizeSlider';
 import SVGCircle from './SVGCircle';
-import beep from '../sounds/robot.mp3';
+import beep from '../sounds/robot2.mp3';
 import chime from '../sounds/chime.mp3';
 
 // Contexts
@@ -34,16 +34,33 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     flex: '1 0 auto',
   },
+  clickableCircle: {
+    height: 350,
+    width: 350,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 99
+  },
+  centerIcons: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bigPlayArrow: {
+    display: 'flex',
+    fontSize: '10rem'
+  },
   nextTitle: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 30,
+    height: 40,
     padding: 5,
   },
   upNext: {
-    height: 20,
-    paddingTop: 5,
+    height: 30,
+    padding: 5,
   },
   svg: {
     position: 'absolute',
@@ -60,19 +77,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const initState = {
-  fontSize: 50,
-  seconds: 0,
-  isPaused: true,
-  color: '#3f51b5',
-  index: 0,
-  setTimer: 0,
-  currentTimer: null,
-  timerInterval: null,
-  radius: 0,
-  sets: null,
-  workoutComplete: false,
-  loadSound: false,
+const initState = () => {
+  return {
+    fontSize: 50,
+    seconds: 0,
+    isPaused: true,
+    color: '#3f51b5',
+    index: 0,
+    setTimer: 0,
+    currentTimer: null,
+    timerInterval: null,
+    radius: 0,
+    sets: null,
+    workoutComplete: false,
+    countDownSound: new Audio(beep),
+    finalSound: new Audio(chime)
+  }
 };
 
 // From StackOverflow: https://stackoverflow.com/questions/10756313/javascript-jquery-map-a-range-of-numbers-to-another-range-of-numbers
@@ -98,40 +118,42 @@ const stateReducer = (state, action) => {
         index: state.index + 1,
       }
     case 'UPDATE_TIMER':
-      return { 
+      return {
         ...state, 
         setTimer: action.value,
         currentTimer: action.value > 0 ? action.value : 0,
-        radius: 360 - mapNumber(action.value, action.value, 0, 0, 360,),
+        radius: 360 - mapNumber(action.value > 0 ? action.value : 0,
+                                action.value > 0 ? action.value : 0, 
+                                0, 
+                                0, 
+                                360)
       }
     case 'DECREMENT_TIMER':
       return { 
         ...state, 
         currentTimer: state.currentTimer > 0 ? state.currentTimer - 1 : 0,
-        radius: 360 - mapNumber(state.currentTimer - 1, state.setTimer, 0, 0, 360)
+        radius: 360 - mapNumber(state.currentTimer > 0 ? state.currentTimer - 1 : 0, 
+                                state.setTimer, 
+                                0, 
+                                0, 
+                                360)
       }
     case 'RADIUS':
       return { ...state, secondsRadius: action.value }
     case 'SET_INTERVAL':
       return { ...state, timerInterval: action.value }
-    case 'LOAD_SOUND':
-      return { ...state, loadSound: action.value }
     case 'COMPLETE':
       return { ...state, workoutComplete: true }
+    case 'PLAY_SOUND':
+      return { ...state }
     default:
       return { ...state };
   }
 };
 
 const StartWorkout = ({ goBack }) => {
-  const [state, dispatch] = useReducer(stateReducer, initState);
-  const countDownSound = new Audio(beep);
-  const finalSound = new Audio(chime)
+  const [state, dispatch] = useReducer(stateReducer, initState());
   const classes = useStyles();
-
-  // Set the volume on sounds
-  countDownSound.volume = 0.5;
-  finalSound.volume = 0.5;
 
   // Global States
   const currentWorkout = useContext(CurrentWorkout);
@@ -144,9 +166,9 @@ const StartWorkout = ({ goBack }) => {
 
   const playSound = () => {
     if (state.currentTimer === 0) {
-      finalSound.play();
+      state.finalSound.play()
     } else {
-      countDownSound.play();
+      state.countDownSound.play()
     }
   }
 
@@ -175,10 +197,7 @@ const StartWorkout = ({ goBack }) => {
   const handlePlay = () => {
     dispatch({ type: 'SET_IS_PAUSED', value: !state.isPaused })
     // Hack for iOS and Android browswers for sound to work
-    countDownSound.play();
-    countDownSound.pause();
-    finalSound.play();
-    finalSound.pause();
+
   }
 
   const handleExit = () => {
@@ -194,6 +213,7 @@ const StartWorkout = ({ goBack }) => {
     if (!state.isPaused) {
       const timerInterval = setInterval(() => {
         dispatch({ type: 'DECREMENT_TIMER'})
+        dispatch({ type: 'PLAY_SOUND'})
       }, 1000);
       dispatch({ type: 'SET_INTERVAL', value: timerInterval })
     } else {
@@ -213,23 +233,18 @@ const StartWorkout = ({ goBack }) => {
         isDisabled={!state.isPaused}
       />
       <Box className={classes.timerBox}>
-        <Typography component="div">
-          <Box fontSize={state.fontSize} color={state.color} m={1}>
+        <Typography className={classes.clickableCircle} onClick={() => handlePlay()} component="div">
+          <Box className={classes.centerIcons} fontSize={state.fontSize} color={state.color} m={1}>
             {moment.utc(state.currentTimer * 1000).format('mm:ss')}
-            {(state.currentTimer !== null && state.currentTimer <= 3)
+            {(state.currentTimer !== null && state.currentTimer < 4)
               ? playSound()
               : ''}
           </Box>
         </Typography>
+
         {state.currentTimer === 0 ? goToNext() : '' }
         <SVGCircle radius={state.radius} color={state.color} svgClass={classes.svg} />
       </Box>
-      <Typography className={classes.upNext} variant='caption'>
-        { !state.workoutComplete && state.index < currentWorkout.state.sets.length - 1 ? 'Up Next:' : ''}
-      </Typography>
-      <Typography className={classes.nextTitle} variant='h5'>
-        { state.workoutComplete? 'Completed Workout' : getNextTitle() }
-      </Typography>
       <Box className={classes.buttons}>
         <Tooltip title='Exit Workout' enterDelay={400}>
           <IconButton onClick={() => handleExit()} color='primary'>
@@ -253,6 +268,12 @@ const StartWorkout = ({ goBack }) => {
           </IconButton>
         </Tooltip>
       </Box>
+      <Typography className={classes.upNext} variant='caption'>
+        { !state.workoutComplete && state.index < currentWorkout.state.sets.length - 1 ? 'Up Next:' : ''}
+      </Typography>
+      <Typography className={classes.nextTitle} variant='h5'>
+        { state.workoutComplete? 'Completed Workout' : getNextTitle() }
+      </Typography>
     </Container>
   );
 };

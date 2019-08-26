@@ -33,7 +33,7 @@ class Firebase {
   }
 
   signInWithProvider(provider) {
-    return this.auth.signInWithPopup(provider);
+    return this.auth.signInWithRedirect(provider);
   }
 
   signInAnonymously() {

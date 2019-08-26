@@ -10,6 +10,7 @@ import Fitness from '../images/fitness.jpg';
 
 const useStyles = makeStyles(theme => ({
   container: {
+    height: '100%',
     backgroundImage: `url(${Fitness})`,
     backgroundSize: '100%',
     backgroundRepeat: 'no-repeat',
@@ -52,7 +53,7 @@ const Welcome = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <CssBaseline />
       <main className={classes.container}>
         <div className={classes.containerContent}>
@@ -89,7 +90,7 @@ const Welcome = () => {
           </React.Fragment>
         )}
       </main>
-    </React.Fragment>
+    </>
   );
 };
 

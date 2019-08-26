@@ -6,7 +6,7 @@ import Slider from '@material-ui/core/Slider';
 
 const useStyles = makeStyles({
   root: {
-    padding: 20,
+    padding: 10,
     width: 200,
   },
 });
