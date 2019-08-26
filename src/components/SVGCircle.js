@@ -41,14 +41,14 @@ const SVGCircle = ({ radius, color, svgClass}) => {
         stroke={color}
         strokeOpacity="0.3"
         strokeWidth="5"
-        d={describeArc(200, 200, 192, 0, 359.99999)}
+        d={describeArc(200, 200, 180, 0, 359.99999)}
       />
       <path
         fill="none"
         stroke={color}
         strokeOpacity="0.6"
         strokeWidth="5"
-        d={describeArc(200, 200, 192, 0, radius)}
+        d={describeArc(200, 200, 180, 0, radius)}
       />
     </svg>
   )

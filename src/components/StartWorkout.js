@@ -101,7 +101,7 @@ const stateReducer = (state, action) => {
       return { 
         ...state, 
         setTimer: action.value,
-        currentTimer: action.value,
+        currentTimer: action.value >= 0 ? action.value : 0,
         radius: 360 - mapNumber(action.value, action.value, 0, 0, 360,),
       }
     case 'DECREMENT_TIMER':
@@ -139,7 +139,7 @@ const StartWorkout = ({ goBack }) => {
   const loadTimer = () => {
     const timer = currentWorkout.state.sets[state.index].seconds + 
       (currentWorkout.state.sets[state.index].minutes * 60);
-    dispatch({ type: 'UPDATE_TIMER', value: timer * 100 })
+    dispatch({ type: 'UPDATE_TIMER', value: timer * 10 })
   }
 
   const playSound = () => {
@@ -188,10 +188,8 @@ const StartWorkout = ({ goBack }) => {
   useEffect(() => {
     if (!state.isPaused) {
       const timerInterval = setInterval(() => {
-        if (state.currentTimer > 0) {
-          dispatch({ type: 'DECREMENT_TIMER'})
-        }
-      }, 10);
+        dispatch({ type: 'DECREMENT_TIMER'})
+      }, 100);
       dispatch({ type: 'SET_INTERVAL', value: timerInterval })
     } else {
       clearInterval(state.timerInterval);
@@ -212,9 +210,9 @@ const StartWorkout = ({ goBack }) => {
       <Box className={classes.timerBox}>
         <Typography component="div">
           <Box fontSize={state.fontSize} color={state.color} m={1}>
-            {moment.utc(state.currentTimer * 10).format('mm:ss:SS')}
-            {(state.currentTimer !== null && state.currentTimer <= 300
-              && state.currentTimer % 100 === 0) 
+            {moment.utc(state.currentTimer * 100).format('mm:ss:S')}
+            {(state.currentTimer !== null && state.currentTimer <= 30
+              && state.currentTimer % 10 === 0) 
               ? playSound()
               : ''}
           </Box>
