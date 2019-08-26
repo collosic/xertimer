@@ -101,13 +101,13 @@ const stateReducer = (state, action) => {
       return { 
         ...state, 
         setTimer: action.value,
-        currentTimer: action.value >= 0 ? action.value : 0,
+        currentTimer: action.value > 0 ? action.value : 0,
         radius: 360 - mapNumber(action.value, action.value, 0, 0, 360,),
       }
     case 'DECREMENT_TIMER':
       return { 
         ...state, 
-        currentTimer: state.currentTimer - 1,
+        currentTimer: state.currentTimer > 0 ? state.currentTimer - 1 : 0,
         radius: 360 - mapNumber(state.currentTimer - 1, state.setTimer, 0, 0, 360)
       }
     case 'RADIUS':
@@ -139,14 +139,14 @@ const StartWorkout = ({ goBack }) => {
   const loadTimer = () => {
     const timer = currentWorkout.state.sets[state.index].seconds + 
       (currentWorkout.state.sets[state.index].minutes * 60);
-    dispatch({ type: 'UPDATE_TIMER', value: timer * 10 })
+    dispatch({ type: 'UPDATE_TIMER', value: timer })
   }
 
   const playSound = () => {
-    if (state.currentTimer !== 0) {
-      countDownSound.play();
-    } else {
+    if (state.currentTimer === 0) {
       finalSound.play();
+    } else {
+      countDownSound.play();
     }
   }
 
@@ -174,6 +174,11 @@ const StartWorkout = ({ goBack }) => {
   }
   const handlePlay = () => {
     dispatch({ type: 'SET_IS_PAUSED', value: !state.isPaused })
+    // Hack for iOS and Android browswers for sound to work
+    countDownSound.play();
+    countDownSound.pause();
+    finalSound.play();
+    finalSound.pause();
   }
 
   const handleExit = () => {
@@ -189,7 +194,7 @@ const StartWorkout = ({ goBack }) => {
     if (!state.isPaused) {
       const timerInterval = setInterval(() => {
         dispatch({ type: 'DECREMENT_TIMER'})
-      }, 100);
+      }, 1000);
       dispatch({ type: 'SET_INTERVAL', value: timerInterval })
     } else {
       clearInterval(state.timerInterval);
@@ -210,9 +215,8 @@ const StartWorkout = ({ goBack }) => {
       <Box className={classes.timerBox}>
         <Typography component="div">
           <Box fontSize={state.fontSize} color={state.color} m={1}>
-            {moment.utc(state.currentTimer * 100).format('mm:ss:S')}
-            {(state.currentTimer !== null && state.currentTimer <= 30
-              && state.currentTimer % 10 === 0) 
+            {moment.utc(state.currentTimer * 1000).format('mm:ss')}
+            {(state.currentTimer !== null && state.currentTimer <= 3)
               ? playSound()
               : ''}
           </Box>

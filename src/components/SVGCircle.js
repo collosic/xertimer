@@ -54,4 +54,4 @@ const SVGCircle = ({ radius, color, svgClass}) => {
   )
 };
 
-export default SVGCircle;
+export default React.memo(SVGCircle);
