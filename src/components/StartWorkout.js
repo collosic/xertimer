@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     flexGrow: '1',
     padding: 40,
+    minHeight: '720px',
   },
   slider: {
     padding: 10,
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 40,
+    height: 30,
     padding: 5,
   },
   upNext: {
