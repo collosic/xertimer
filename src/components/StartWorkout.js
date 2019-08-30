@@ -1,13 +1,13 @@
 import React, { useEffect, useReducer, useContext } from 'react';
 import { makeStyles} from '@material-ui/core/styles';
-import { Container, Typography,Box, Tooltip, IconButton } from '@material-ui/core';
-import { PlayArrow, Pause, SkipNext, Close } from '@material-ui/icons';
+import { Container, Typography,Box, Tooltip, IconButton, Divider } from '@material-ui/core';
+import { PlayArrow, Pause, SkipNext, Close, VolumeUp, VolumeOff } from '@material-ui/icons';
 import moment from 'moment';
 
 import FontSizeSlider from './FontSizeSlider';
 import SVGCircle from './SVGCircle';
-import beep from '../sounds/robot2.mp3';
-import chime from '../sounds/chime.mp3';
+import beep from '../sounds/beep.mp3';
+import chime from '../sounds/censor_beep.mp3';
 
 // Contexts
 import { CurrentWorkout } from '../store/Store';
@@ -22,6 +22,12 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: '1',
     padding: 40,
     minHeight: '720px',
+  },
+  topPanel: {
+    display: 'flex',
+    width: 300,
+    justifyContent: 'space-evenly',
+    alignItems: 'center'
   },
   slider: {
     padding: 10,
@@ -80,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
 
 const initState = () => {
   return {
-    fontSize: 50,
+    fontSize: 80,
     seconds: 0,
     isPaused: true,
     color: '#3f51b5',
@@ -92,7 +98,8 @@ const initState = () => {
     sets: null,
     workoutComplete: false,
     countDownSound: new Audio(beep),
-    finalSound: new Audio(chime)
+    finalSound: new Audio(chime),
+    isVolumeOn: true,
   }
 };
 
@@ -145,8 +152,8 @@ const stateReducer = (state, action) => {
       return { ...state, timerInterval: action.value }
     case 'COMPLETE':
       return { ...state, workoutComplete: true }
-    case 'PLAY_SOUND':
-      return { ...state }
+    case 'TOGGLE_SOUNDS':
+      return { ...state, isVolumeOn: !state.isVolumeOn }
     default:
       return { ...state };
   }
@@ -195,8 +202,12 @@ const StartWorkout = ({ goBack }) => {
       ? `${currentWorkout.state.sets[state.index + 1].title}`
       : 'One More To Go'
   }
+
+  const toggleSound = () => {
+    dispatch({ type: 'TOGGLE_SOUNDS' });
+  }
+  
   const handlePlay = () => {
-    console.log('playing...')
     dispatch({ type: 'SET_IS_PAUSED', value: !state.isPaused })
     // Hack for iOS and Android browswers for sound to work
 
@@ -229,15 +240,28 @@ const StartWorkout = ({ goBack }) => {
   return (
     <Container className={classes.container}>
       <Typography variant='h2'>{currentWorkout.state.sets[state.index].title}</Typography>
-      <FontSizeSlider 
-        updateFontSize={handleFontChange} 
-        isDisabled={!state.isPaused}
-      />
+      <Divider />
+      <Box className={classes.topPanel}>
+        <Box>
+          <Tooltip title={state.isVolumeOn ? 'Turn off sound' : 'Turn on sound'} enterDelay={400}>
+            <IconButton onClick={() => toggleSound()} color='primary'>
+              {state.isVolumeOn 
+                ? <VolumeUp />
+                : <VolumeOff />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <FontSizeSlider 
+          updateFontSize={handleFontChange} 
+          isDisabled={!state.isPaused}
+        />
+      </Box>
+      
       <Box className={classes.timerBox}>
         <Typography className={classes.clickableCircle} component="div" onClick={() => handlePlay()}>
           <Box className={classes.centerIcons} fontSize={state.fontSize} color={state.color} m={1}>
             {moment.utc(state.currentTimer * 1000).format('mm:ss')}
-            {(state.currentTimer !== null && state.currentTimer < 4)
+            {(state.currentTimer !== null && state.currentTimer < 4 && state.isVolumeOn)
               ? playSound()
               : ''}
           </Box>

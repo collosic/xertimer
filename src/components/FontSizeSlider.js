@@ -6,7 +6,7 @@ import Slider from '@material-ui/core/Slider';
 
 const useStyles = makeStyles({
   root: {
-    padding: 10,
+    padding: 5,
     width: 200,
   },
 });
@@ -17,7 +17,7 @@ const FontSizeSlider = ({ updateFontSize, isDisabled }) => {
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
-    updateFontSize(Number(newValue) + 50);
+    updateFontSize(Number(newValue) + 80);
   };
 
   return (
@@ -30,11 +30,10 @@ const FontSizeSlider = ({ updateFontSize, isDisabled }) => {
           <Slider
             disabled={isDisabled}
             value={value}
-            defaultValue={0}
             onChange={handleSliderChange}
             aria-labelledby='input-slider'
             step={4}
-            max={40}
+            max={20}
             marks
           />
         </Grid>
