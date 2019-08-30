@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    cursor: 'pointer',
     zIndex: 99
   },
   centerIcons: {
@@ -195,6 +196,7 @@ const StartWorkout = ({ goBack }) => {
       : 'One More To Go'
   }
   const handlePlay = () => {
+    console.log('playing...')
     dispatch({ type: 'SET_IS_PAUSED', value: !state.isPaused })
     // Hack for iOS and Android browswers for sound to work
 
@@ -213,7 +215,6 @@ const StartWorkout = ({ goBack }) => {
     if (!state.isPaused) {
       const timerInterval = setInterval(() => {
         dispatch({ type: 'DECREMENT_TIMER'})
-        dispatch({ type: 'PLAY_SOUND'})
       }, 1000);
       dispatch({ type: 'SET_INTERVAL', value: timerInterval })
     } else {
@@ -233,7 +234,7 @@ const StartWorkout = ({ goBack }) => {
         isDisabled={!state.isPaused}
       />
       <Box className={classes.timerBox}>
-        <Typography className={classes.clickableCircle} onClick={() => handlePlay()} component="div">
+        <Typography className={classes.clickableCircle} component="div" onClick={() => handlePlay()}>
           <Box className={classes.centerIcons} fontSize={state.fontSize} color={state.color} m={1}>
             {moment.utc(state.currentTimer * 1000).format('mm:ss')}
             {(state.currentTimer !== null && state.currentTimer < 4)
@@ -243,7 +244,11 @@ const StartWorkout = ({ goBack }) => {
         </Typography>
 
         {state.currentTimer === 0 ? goToNext() : '' }
-        <SVGCircle radius={state.radius} color={state.color} svgClass={classes.svg} />
+        <SVGCircle 
+          radius={state.radius} 
+          color={state.color} 
+          svgClass={classes.svg} 
+        />
       </Box>
       <Box className={classes.buttons}>
         <Tooltip title='Exit Workout' enterDelay={400}>
