@@ -93,7 +93,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Login = (props) => {
+const Login = props => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isResetPassDialogOpen, setResetPassDialogOpen] = useState(false);
   const [isSnackBarOpen, setIsSnackBarOpen] = useState(false);
@@ -105,7 +105,7 @@ const Login = (props) => {
   });
   const [errors, setErrors] = useState(null);
 
-  const setAuthenticating = (flag) => {
+  const setAuthenticating = flag => {
     setIsAuthenticating(flag);
     props.onAuthenticating(flag);
   };
@@ -149,7 +149,8 @@ const Login = (props) => {
     }
   };
 
-  const determineIfNewUserandRoute = async (results) => {
+  const determineIfNewUserandRoute = async results => {
+    debugger;
     const newUser = results.additionalUserInfo.isNewUser;
     if (newUser) {
       const userData = {
@@ -194,11 +195,11 @@ const Login = (props) => {
     setValues({ ...values, [prop]: !values[prop] });
   };
 
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownPassword = event => {
     event.preventDefault();
   };
 
-  const handleChange = prop => (event) => {
+  const handleChange = prop => event => {
     setValues({ ...values, [prop]: event.target.value });
   };
 
@@ -220,36 +221,45 @@ const Login = (props) => {
           <DialogContent className={classes.content}>
             <form>
               <TextField
-                autoComplete="email"
+                autoComplete='email'
                 error={!!(errors && errors.emailAddress)}
                 fullWidth
-                helperText={errors && errors.emailAddress ? errors.emailAddress[0] : ''}
-                label="E-mail address"
-                margin="normal"
+                helperText={
+                  errors && errors.emailAddress ? errors.emailAddress[0] : ''
+                }
+                label='E-mail address'
+                margin='normal'
                 onChange={handleChange('emailAddress')}
-                type="email"
+                type='email'
                 value={values.emailAddress}
               />
-              <FormControl className={classes.inputFields} error={!!(errors && errors.password)}>
-                <InputLabel htmlFor="adornment-password">Password</InputLabel>
+              <FormControl
+                className={classes.inputFields}
+                error={!!(errors && errors.password)}
+              >
+                <InputLabel htmlFor='adornment-password'>Password</InputLabel>
                 <Input
-                  id="adornment-password"
+                  id='adornment-password'
                   type={values.showPassword ? 'text' : 'password'}
                   value={values.password}
                   onChange={handleChange('password')}
-                  endAdornment={(
-                    <InputAdornment position="end">
+                  endAdornment={
+                    <InputAdornment position='end'>
                       <IconButton
-                        aria-label="toggle password visibility"
+                        aria-label='toggle password visibility'
                         onClick={handleClickShowPassword('showPassword')}
                         onMouseDown={handleMouseDownPassword}
                       >
-                        {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                        {values.showPassword ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
                       </IconButton>
                     </InputAdornment>
-)}
+                  }
                 />
-                <FormHelperText id="adornment-password">
+                <FormHelperText id='adornment-password'>
                   {errors && errors.password ? errors.password[0] : ''}
                 </FormHelperText>
               </FormControl>
@@ -258,9 +268,11 @@ const Login = (props) => {
           <DialogActions className={classes.dialogActions}>
             <Button
               className={classes.button}
-              disabled={!values.emailAddress || !values.password || isAuthenticating}
-              variant="contained"
-              color="secondary"
+              disabled={
+                !values.emailAddress || !values.password || isAuthenticating
+              }
+              variant='contained'
+              color='secondary'
               fullWidth
               onClick={() => signIn()}
             >
@@ -269,9 +281,9 @@ const Login = (props) => {
             <Typography
               onClick={() => openResetPassDialog()}
               className={classes.forgotPass}
-              variant="caption"
+              variant='caption'
               style={{ cursor: 'pointer' }}
-              color="textPrimary"
+              color='textPrimary'
             >
               Reset Password?
             </Typography>
@@ -279,32 +291,34 @@ const Login = (props) => {
 
           <DialogContent className={classes.content}>
             <DialogContentText className={classes.dialogText}>
-              <Typography variant="caption">Or use the following</Typography>
+              <Typography variant='caption'>Or use the following</Typography>
             </DialogContentText>
             <DialogActions className={classes.socialIcons}>
-              <Tooltip title="Facebook">
+              <Tooltip title='Facebook'>
                 <IconButton
                   className={classes.button}
-                  aria-label="delete"
+                  aria-label='delete'
                   disabled={isAuthenticating}
                 >
                   <FacebookBoxIcon className={classes.facebookIcon} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Google">
+              <Tooltip title='Google'>
                 <IconButton
                   className={classes.button}
-                  color="primary"
+                  color='primary'
                   disabled={isAuthenticating}
-                  onClick={() => signInWithProvider(firebase.getGoogleProvider())}
+                  onClick={() =>
+                    signInWithProvider(firebase.getGoogleProvider())
+                  }
                 >
                   <GoogleIcon className={classes.googleIcon} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Guest Login">
+              <Tooltip title='Guest Login'>
                 <IconButton
                   className={classes.button}
-                  aria-label="add an alarm"
+                  aria-label='add an alarm'
                   disabled={isAuthenticating}
                   onClick={() => signInAnonymously()}
                 >
@@ -316,8 +330,8 @@ const Login = (props) => {
         </div>
         <DialogActions className={classes.createAccountParent}>
           <Button
-            size="small"
-            color="secondary"
+            size='small'
+            color='secondary'
             className={classes.margin}
             onClick={props.changeDialog}
           >
@@ -327,16 +341,23 @@ const Login = (props) => {
       </div>
       {isResetPassDialogOpen && (
         <>
-          <Hidden only="xs">
-            <ResetPassword onClose={closeResetPassDialog} onEmailSent={openSnackBar} />
+          <Hidden only='xs'>
+            <ResetPassword
+              onClose={closeResetPassDialog}
+              onEmailSent={openSnackBar}
+            />
           </Hidden>
           <Hidden only={['sm', 'md', 'lg', 'xl']}>
-            <ResetPassword fullScreen onClose={closeResetPassDialog} onEmailSent={openSnackBar} />
+            <ResetPassword
+              fullScreen
+              onClose={closeResetPassDialog}
+              onEmailSent={openSnackBar}
+            />
           </Hidden>
         </>
       )}
       {isAuthenticating && <Spinner />}
-      {isSnackBarOpen && <CustomSnackBar message="Email sent successfully" />}
+      {isSnackBarOpen && <CustomSnackBar message='Email sent successfully' />}
     </div>
   );
 };
