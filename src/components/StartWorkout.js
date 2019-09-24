@@ -204,13 +204,11 @@ const StartWorkout = ({ goBack }) => {
   };
 
   const goToNext = () => {
+    clearInterval(state.timerInterval);
     if (state.index < currentWorkout.state.sets.length - 1) {
       dispatch({ type: 'NEXT', value: currentWorkout.state.sets });
-      //loadTimer();
     } else {
       // timer has ended
-      clearInterval(state.timerInterval);
-      //loadTimer();
       dispatch({ type: 'SET_IS_PAUSED', value: true });
       dispatch({ type: 'COMPLETE' });
     }
