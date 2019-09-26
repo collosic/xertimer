@@ -3,7 +3,7 @@
 
 <img align="right" width="150" src="./src/images/xertimer-image.png" />
 
-Application that allows you to customize timers for workouts. You are given an option to use a timer, no timer, or rest type.
+Exercise application that allows you to customize timers for workouts. You are given an option to use a timer, no timer (use repetitions), or rest type.
 
 - The timer type is for sets that require a custom, fixed, and mixed timer
 - The no timer type is for sets that use repetitions instead of a set timer
