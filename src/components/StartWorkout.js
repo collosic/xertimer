@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/styles';
 import {
   Container,
   Typography,
@@ -98,13 +99,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const initState = () => {
+const initState = initialColor => {
   return {
     type: null,
     fontSize: 80,
     seconds: 0,
     isPaused: true,
-    color: '#3f51b5',
+    color: initialColor,
     index: 0,
     setTimer: 0,
     currentTimer: null,
@@ -140,7 +141,9 @@ const stateReducer = (state, action) => {
       return {
         ...state,
         color:
-          action.value[state.index + 1].type === 'REST' ? '#ff7f50' : '#3f51b5',
+          action.value[state.index + 1].type === 'REST'
+            ? action.secondaryColor
+            : action.primaryColor,
         index: state.index + 1,
       };
     case 'UPDATE_REPS':
@@ -189,7 +192,11 @@ const stateReducer = (state, action) => {
 };
 
 const StartWorkout = ({ goBack }) => {
-  const [state, dispatch] = useReducer(stateReducer, initState());
+  const theme = useTheme();
+  const [state, dispatch] = useReducer(
+    stateReducer,
+    initState(theme.palette.primary.main),
+  );
   const classes = useStyles();
 
   // Global States
@@ -206,9 +213,14 @@ const StartWorkout = ({ goBack }) => {
   const goToNext = () => {
     clearInterval(state.timerInterval);
     if (state.index < currentWorkout.state.sets.length - 1) {
-      dispatch({ type: 'NEXT', value: currentWorkout.state.sets });
+      dispatch({
+        type: 'NEXT',
+        value: currentWorkout.state.sets,
+        primaryColor: theme.palette.primary.main,
+        secondaryColor: theme.palette.secondary.main,
+      });
     } else {
-      // timer has ended
+      // timer has endeds
       dispatch({ type: 'SET_IS_PAUSED', value: true });
       dispatch({ type: 'COMPLETE' });
     }

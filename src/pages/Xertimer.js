@@ -1,4 +1,5 @@
-import React, { useReducer, useContext } from 'react';
+import React, { useReducer, useContext, useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Layout from '../components/Layout';
 import XertimerMain from '../components/XertimerMain';
@@ -6,6 +7,7 @@ import ExerciseLayout from '../components/ExerciseLayout';
 import StartWorkout from '../components/StartWorkout';
 
 import CustomSnackBar from '../components/CustomSnackBar';
+import firebase from '../components/Firebase';
 
 // Xertimer context
 import { CurrentWorkout, AllWorkouts } from '../store/Store';
@@ -68,7 +70,7 @@ const stateReducer = (state, action) => {
 };
 
 // Component
-const Xertimer = () => {
+const Xertimer = props => {
   const [state, dispatch] = useReducer(stateReducer, initState);
   const classes = useStyles();
 
@@ -140,9 +142,19 @@ const Xertimer = () => {
     }
   };
 
+  useEffect(() => {
+    const getUser = async () => {
+      const user = await firebase.getCurrentUser();
+      if (!user) {
+        props.history.replace('/');
+      }
+    };
+    getUser();
+  }, [props.history]);
+
   return (
     <div className={classes.container}>
-      <Layout />
+      <Layout isSignedIn />
       {getView()}
       {state.openSnackBar && (
         <CustomSnackBar
@@ -154,4 +166,4 @@ const Xertimer = () => {
   );
 };
 
-export default Xertimer;
+export default withRouter(Xertimer);

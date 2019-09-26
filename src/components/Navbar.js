@@ -34,12 +34,13 @@ const NavBar = props => {
 
   const signOutUser = async () => {
     await firebase.logout();
+    debugger;
     props.history.replace('/');
   };
 
   return (
     <div className={classes.root}>
-      <AppBar position='static'>
+      <AppBar color='primary' position='static'>
         <Toolbar>
           <Typography variant='h6' className={classes.title}>
             XerTimer

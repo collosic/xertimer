@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,6 +12,7 @@ import { Tooltip } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import IconButton from '@material-ui/core/IconButton';
 import { PlayArrow, Edit, Delete } from '@material-ui/icons';
+import Fab from '@material-ui/core/Fab';
 
 // Custom Components
 import DeleteWorkoutDialog from '../dialogs/DeleteWorkoutDialog';
@@ -62,15 +64,31 @@ const useStyles = makeStyles(theme => ({
       'linear-gradient(to bottom, #D5DEE7 0%, #E8EBF2 50%, #E2E7ED 100%), linear-gradient(to bottom, rgba(0,0,0,0.02) 50%, rgba(255,255,255,0.02) 61%, rgba(0,0,0,0.02) 73%), linear-gradient(33deg, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0.20) 100%)',
     backgroundBlendMode: 'normal,color-burn',
   },
+  cardHeader: {
+    height: 110,
+    color: theme.palette.common.white,
+    background: theme.palette.secondary.main,
+  },
   cardMedia: {
     paddingTop: '56.25%', // 16:9
   },
   cardContent: {
     flexGrow: 1,
+    marginTop: -15,
   },
   cardButtons: {
     display: 'flex',
     justifyContent: 'space-around',
+  },
+  deleteButton: {
+    color: theme.palette.error.dark,
+  },
+  startFab: {
+    top: 'auto',
+    bottom: 20,
+    left: 'auto',
+    right: 25,
+    alignSelf: 'flex-end',
   },
   footer: {
     backgroundColor: theme.palette.background.paper,
@@ -155,8 +173,8 @@ const XertimerMain = ({
         <div className={classes.containerContent}>
           <Container maxWidth='lg'>
             <Typography
-              component='h1'
-              variant='h2'
+              component='h3'
+              variant='h3'
               align='center'
               color='textPrimary'
               gutterBottom
@@ -192,11 +210,24 @@ const XertimerMain = ({
           <Grid container spacing={3}>
             {allWorkouts.state.map(card => (
               <Grid item key={card.id} xs={12} sm={6} md={4} lg={3}>
-                <Card className={classes.card}>
+                <Card className={classes.card} raised>
+                  <CardHeader
+                    className={classes.cardHeader}
+                    title={card.workout.title}
+                    align='center'
+                  />
+                  <Tooltip title='Start' enterDelay={400}>
+                    <Fab
+                      color='primary'
+                      size='medium'
+                      aria-label='start'
+                      className={classes.startFab}
+                      onClick={() => startTimer(card.id)}
+                    >
+                      <PlayArrow />
+                    </Fab>
+                  </Tooltip>
                   <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant='h5' component='h2'>
-                      {card.workout.title}
-                    </Typography>
                     <Typography>{`Sets: ${card.workout.numberOfSets}`}</Typography>
                     <Typography>
                       {`Timer Length: 
@@ -208,15 +239,10 @@ const XertimerMain = ({
                     </Typography>
                   </CardContent>
                   <CardActions className={classes.cardButtons}>
-                    <Tooltip title='Start' enterDelay={400}>
-                      <IconButton onClick={() => startTimer(card.id)} color='primary'>
-                        <PlayArrow />
-                      </IconButton>
-                    </Tooltip>
                     <Tooltip title='Edit' enterDelay={400}>
                       <IconButton
                         onClick={() => handleEdit(card.id)}
-                        coloor='primary'
+                        color='primary'
                       >
                         <Edit />
                       </IconButton>
@@ -224,7 +250,7 @@ const XertimerMain = ({
                     <Tooltip title='Delete' enterDelay={400}>
                       <IconButton
                         onClick={() => openDeleteWorkoutDialog(card.id)}
-                        color='secondary'
+                        className={classes.deleteButton}
                       >
                         <Delete />
                       </IconButton>

@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.3.0",
     "@material-ui/icons": "^4.2.1",
+    "@material-ui/styles": "^4.4.3",
     "@material-ui/system": "^4.3.3",
     "@types/dotenv": "^6.1.1",
     "array-move": "^2.1.0",
