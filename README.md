@@ -1,21 +1,22 @@
-# Xertimer
 
-## Link to the site
+# XerTimer (Exercise Timer)
 
-[XerTimer](https://xertimer.web.app/)
+<img align="right" width="150" src="./src/images/xertimer-image.png" />
 
-Small application that allows you to customize timers for workouts. You are given an option to use a timer, no timer, or rest type.
+Application that allows you to customize timers for workouts. You are given an option to use a timer, no timer, or rest type.
 
-- The timer is for sets that require a custom timer
-- The no timer is for sets that use repetition instead of a timer
-- The rest is for your rest period if you require one
+- The timer type is for sets that require a custom, fixed, and mixed timer
+- The no timer type is for sets that use repetitions instead of a set timer
+- The rest type is for your rest period if you require one
+
+## [XerTimer](https://xertimer.web.app/)
 
 ## How to use
 
-1. You will first need to create an account using either an email or a provider
-2. Create a new exercise
+1. You will first need to create an account
+2. Once you are logged in create a new exercise
 3. Customize your exercise plan
-4. You have the option to repeat a sinle exercise and rest period if desired
+4. Feel free to move the exercise with the drag and drop functionality to reorder the exercise list
 5. Save your exercise
 6. You will be given the option to start, edit or delete the exercise you just created
 7. Start the exercise and sweat away!
@@ -23,12 +24,10 @@ Small application that allows you to customize timers for workouts. You are give
 ## Things to do
 
 1. Add a settings for each user in order to save site settings
-2. Add different sounds for the timer
+2. Add options for different sounds for the timer
 3. Add a light/dark theme option
-4. Add in guest functionality
-5. Normalize the Exercises
 
 ## Known issues
 
-1. Facebook provider log in not functional
+1. Facebook provider login not functional
 2. Guest log in not functional
