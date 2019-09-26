@@ -11,7 +11,7 @@ Application that allows you to customize timers for workouts. You are given an o
 
 ## [XerTimer](https://xertimer.web.app/)
 
-## How to use
+### How to use
 
 1. You will first need to create an account
 2. Once you are logged in create a new exercise
@@ -21,13 +21,17 @@ Application that allows you to customize timers for workouts. You are given an o
 6. You will be given the option to start, edit or delete the exercise you just created
 7. Start the exercise and sweat away!
 
-## Things to do
+### Things to do
 
 1. Add a settings for each user in order to save site settings
 2. Add options for different sounds for the timer
 3. Add a light/dark theme option
 
-## Known issues
+### Known issues
 
 1. Facebook provider login not functional
 2. Guest log in not functional
+
+### License
+
+[![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](LICENSE)
