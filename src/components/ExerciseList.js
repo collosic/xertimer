@@ -18,7 +18,7 @@ import {
 } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 
-import { CurrentWorkout } from '../store/Store'
+import { CurrentWorkout } from '../store/Store';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -52,13 +52,15 @@ const ExerciseList = ({ onEdit }) => {
   const handleDelete = uuid => {
     currentWorkoutContext.dispatch({
       type: 'OVERRIDE',
-      value: currentWorkoutContext.state.sets.filter(sets => sets.uuid !== uuid),
+      value: currentWorkoutContext.state.sets.filter(
+        sets => sets.uuid !== uuid,
+      ),
     });
   };
 
   const handleEdit = uuid => {
     onEdit(uuid);
-  }
+  };
 
   const DragHandle = sortableHandle(() => {
     return (
@@ -91,7 +93,7 @@ const ExerciseList = ({ onEdit }) => {
           <ListItemText
             id={`item-${uuid}`}
             primary={<Typography variant='h6'>{`${title}`}</Typography>}
-            secondary={(
+            secondary={
               <>
                 <Typography
                   component='span'
@@ -109,20 +111,25 @@ const ExerciseList = ({ onEdit }) => {
                   {` - ${newType}`}
                 </Typography>
               </>
-            )}
+            }
           />
           <ListItemSecondaryAction>
             <Tooltip title='Edit' enterDelay={400}>
-              <IconButton onClick={() => handleEdit(uuid)} edge='start' aria-label='edit'>
+              <IconButton
+                onClick={() => handleEdit(uuid)}
+                edge='start'
+                aria-label='edit'
+                color='primary'
+              >
                 <EditIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title='Delete' enterDelay={400}>
               <IconButton
                 onClick={() => handleDelete(uuid)}
-                color='secondary'
                 edge='end'
                 aria-label='delete'
+                color='primary'
               >
                 <DeleteIcon />
               </IconButton>
@@ -139,9 +146,14 @@ const ExerciseList = ({ onEdit }) => {
 
   return (
     <SortableContainer onSortEnd={onSortEnd} useDragHandle>
-      {currentWorkoutContext.state && currentWorkoutContext.state.sets.map((value, index) => (
-        <SortableItem key={`item-${value.uuid}`} index={index} value={value} />
-      ))}
+      {currentWorkoutContext.state &&
+        currentWorkoutContext.state.sets.map((value, index) => (
+          <SortableItem
+            key={`item-${value.uuid}`}
+            index={index}
+            value={value}
+          />
+        ))}
     </SortableContainer>
   );
 };

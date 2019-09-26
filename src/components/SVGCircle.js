@@ -33,22 +33,22 @@ function describeArc(x, y, radius, startAngle, endAngle) {
   return d;
 }
 
-const SVGCircle = ({ radius, color, svgClass }) => {
+const SVGCircle = ({ radius, color, svgClass, circleSize, currentRadius }) => {
   return (
     <svg className={svgClass}>
       <path
         fill='none'
         stroke={color}
         strokeOpacity='0.3'
-        strokeWidth='10'
-        d={describeArc(200, 200, 180, 0, 359.99999)}
+        strokeWidth='5'
+        d={describeArc(circleSize, circleSize, currentRadius, 0, 359.99999)}
       />
       <path
         fill='none'
         stroke={color}
         strokeOpacity='0.6'
-        strokeWidth='10'
-        d={describeArc(200, 200, 180, 0, radius)}
+        strokeWidth='5'
+        d={describeArc(circleSize, circleSize, currentRadius, 0, radius)}
       />
     </svg>
   );

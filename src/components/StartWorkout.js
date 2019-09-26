@@ -27,6 +27,8 @@ import chime from '../sounds/censor_beep.mp3';
 // Contexts
 import { CurrentWorkout } from '../store/Store';
 
+console.log(`H: ${window.innerHeight} W:${window.innerWidth}`);
+
 // Styles
 const useStyles = makeStyles(theme => ({
   container: {
@@ -88,6 +90,10 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     width: 400,
     height: 400,
+    [theme.breakpoints.down(400)]: {
+      width: 350,
+      height: 350,
+    },
   },
   buttons: {
     display: 'flex',
@@ -118,6 +124,8 @@ const initState = initialColor => {
     countDownSound: new Audio(beep),
     finalSound: new Audio(chime),
     isVolumeOn: true,
+    currentWidth: window.innerWidth < 400 ? 175 : 200,
+    currentRadius: window.innerWidth < 400 ? 170 : 180,
   };
 };
 
@@ -307,7 +315,7 @@ const StartWorkout = ({ goBack }) => {
 
   return (
     <Container className={classes.container}>
-      <Typography variant='h2'>
+      <Typography variant='h4' align='center'>
         {currentWorkout.state.sets[state.index].title}
       </Typography>
       <Divider />
@@ -350,6 +358,8 @@ const StartWorkout = ({ goBack }) => {
           radius={state.radius}
           color={state.color}
           svgClass={classes.svg}
+          circleSize={state.currentWidth}
+          currentRadius={state.currentRadius}
         />
       </Box>
       <Box className={classes.buttons}>
@@ -379,7 +389,7 @@ const StartWorkout = ({ goBack }) => {
           ? 'Up Next:'
           : ''}
       </Typography>
-      <Typography className={classes.nextTitle} variant='h5'>
+      <Typography className={classes.nextTitle} variant='h5' align='center'>
         {state.workoutComplete ? 'Completed Workout' : getNextTitle()}
       </Typography>
     </Container>

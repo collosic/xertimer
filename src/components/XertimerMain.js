@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     backgroundBlendMode: 'normal,color-burn',
   },
   cardHeader: {
-    height: 110,
+    height: 100,
     color: theme.palette.common.white,
     background: theme.palette.secondary.main,
   },
@@ -79,9 +79,6 @@ const useStyles = makeStyles(theme => ({
   cardButtons: {
     display: 'flex',
     justifyContent: 'space-around',
-  },
-  deleteButton: {
-    color: theme.palette.error.dark,
   },
   startFab: {
     top: 'auto',
@@ -250,7 +247,7 @@ const XertimerMain = ({
                     <Tooltip title='Delete' enterDelay={400}>
                       <IconButton
                         onClick={() => openDeleteWorkoutDialog(card.id)}
-                        className={classes.deleteButton}
+                        color='primary'
                       >
                         <Delete />
                       </IconButton>
