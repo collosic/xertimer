@@ -57,31 +57,33 @@ const Welcome = () => {
       <CssBaseline />
       <main className={classes.container}>
         <div className={classes.containerContent}>
-          <Container maxWidth="sm" className={classes.conatianerText}>
-            <Typography variant="h4" gutterBottom>
+          <Container maxWidth='sm' className={classes.conatianerText}>
+            <Typography variant='h4' gutterBottom>
               Welcome to XerTimer
             </Typography>
-            <Typography variant="body1">
-              XerTimer is a custom interval timer that will assist you in making timers with
-              customized lengths for each rep in a set. You can create multiple sets each with their
-              own unique rep and rest times. It also allows you to make manual sets in the cases
-              where you are doing set number of reps instead of a timed set.
+            <Typography variant='body1'>
+              XerTimer is short for Exercise Timer. It is a custom interval
+              timer that will assist you in making workouts with customized
+              timers and/or repetition sets. You can create multiple sets each
+              with their own unique timed sets, repetition sets and rest
+              periods. This allows a user to create a workout with a mixed type
+              of exercises.
             </Typography>
 
             <Button
-              variant="contained"
-              color="secondary"
-              size="large"
+              variant='contained'
+              color='secondary'
+              size='large'
               className={classes.button}
               onClick={() => openAuthDialog()}
             >
-              <Typography variant="button">Get Started</Typography>
+              <Typography variant='button'>Get Started</Typography>
             </Button>
           </Container>
         </div>
         {isDialogOpen && (
           <React.Fragment>
-            <Hidden only="xs">
+            <Hidden only='xs'>
               <AuthDialog onClose={closeAuthDialog} />
             </Hidden>
             <Hidden only={['sm', 'md', 'lg', 'xl']}>
