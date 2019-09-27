@@ -16,7 +16,7 @@ Exercise application that allows you to customize timers for workouts. You are g
 1. You will first need to create an account
 2. Once you are logged in create a new exercise
 3. Customize your exercise plan
-4. Feel free to move the exercise with the drag and drop functionality to reorder the exercise list
+4. Feel free to move an exercise with the drag and drop functionality to reorder the exercise list
 5. Save your exercise
 6. You will be given the option to start, edit or delete the exercise you just created
 7. Start the exercise and sweat away!
@@ -31,6 +31,7 @@ Exercise application that allows you to customize timers for workouts. You are g
 
 1. Facebook provider login not functional
 2. Guest log in not functional
+3. SVG circle timer does not function properly in Safari or iOS browsers, the timer works fine though.
 
 ### License
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useContext } from 'react';
+import React, { useEffect, useReducer, useContext, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTheme } from '@material-ui/styles';
 import {
@@ -26,8 +26,6 @@ import chime from '../sounds/censor_beep.mp3';
 
 // Contexts
 import { CurrentWorkout } from '../store/Store';
-
-console.log(`H: ${window.innerHeight} W:${window.innerWidth}`);
 
 // Styles
 const useStyles = makeStyles(theme => ({
@@ -194,6 +192,12 @@ const stateReducer = (state, action) => {
       return { ...state, workoutComplete: true };
     case 'TOGGLE_SOUNDS':
       return { ...state, isVolumeOn: !state.isVolumeOn };
+    case 'UPDATE_TIMER_DIMENSIONS':
+      return {
+        ...state,
+        currentWidth: action.value.width,
+        currentRadius: action.value.radius,
+      };
     default:
       return { ...state };
   }
@@ -258,6 +262,20 @@ const StartWorkout = ({ goBack }) => {
     goBack();
   };
 
+  const resize = useCallback(() => {
+    if (window.innerWidth < 400 && state.currentWidth !== 175) {
+      dispatch({
+        type: 'UPDATE_TIMER_DIMENSIONS',
+        value: { width: 175, radius: 170 },
+      });
+    } else if (window.innerWidth > 400 && state.currentWidth !== 200) {
+      dispatch({
+        type: 'UPDATE_TIMER_DIMENSIONS',
+        value: { width: 200, radius: 180 },
+      });
+    }
+  });
+
   useEffect(() => {
     const loadTimer = () => {
       // Determine type and create the timer or rep display as needed
@@ -312,6 +330,14 @@ const StartWorkout = ({ goBack }) => {
       playSound();
     }
   }, [state.currentTimer]);
+
+  // Used to resize timer SVGCirlce dimensions
+  useEffect(() => {
+    window.addEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [resize]);
 
   return (
     <Container className={classes.container}>

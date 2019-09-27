@@ -18,9 +18,11 @@ class Firebase {
     this.firebase = firebase;
     this.auth = firebase.auth();
     this.db = firebase.firestore();
+    this.isGuest = false;
   }
 
   login(email, password) {
+    this.isGuest = false;
     return this.auth.signInWithEmailAndPassword(email, password);
   }
 
@@ -29,15 +31,18 @@ class Firebase {
   }
 
   createAccount(email, password) {
+    this.isGuest = false;
     return this.auth.createUserWithEmailAndPassword(email, password);
   }
 
   signInWithProvider(provider) {
+    this.isGuest = false;
     return this.auth.signInWithRedirect(provider);
   }
 
   signInAnonymously() {
-    return this.auth.signInAnonymously();
+    this.isGuest = true;
+    return this.isGuest;
   }
 
   resetPasswordEmail(emailAddress) {

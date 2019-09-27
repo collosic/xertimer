@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -15,6 +15,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import Divider from '@material-ui/core/Divider';
 
 import firebase from './Firebase';
+import MainDrawer from './drawers/MainDrawer';
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(2),
   },
   title: {
-    display: 'none',
+    display: 'block',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
@@ -80,8 +81,9 @@ const useStyles = makeStyles(theme => ({
 
 const LoggedInAppBar = props => {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [isMainDrawerOpen, setIsMainDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -103,10 +105,6 @@ const LoggedInAppBar = props => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const handleOpenDrawer = () => {
-    console.log('Open');
-  };
-
   const signOutUser = async () => {
     await firebase.logout();
     props.history.replace('/');
@@ -123,8 +121,8 @@ const LoggedInAppBar = props => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-      <Divider />
+      {/* <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+      <Divider /> */}
       <MenuItem onClick={() => signOutUser()}>Logout</MenuItem>
     </Menu>
   );
@@ -158,7 +156,7 @@ const LoggedInAppBar = props => {
     <div className={classes.grow}>
       <AppBar position='static'>
         <Toolbar>
-          <IconButton
+          {/* <IconButton
             edge='start'
             className={classes.menuButton}
             color='inherit'
@@ -166,11 +164,11 @@ const LoggedInAppBar = props => {
             onClick={() => handleOpenDrawer()}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
           <Typography className={classes.title} variant='h6' noWrap>
             Xertimer
           </Typography>
-          <div className={classes.search}>
+          {/* <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
             </div>
@@ -182,7 +180,7 @@ const LoggedInAppBar = props => {
               }}
               inputProps={{ 'aria-label': 'search' }}
             />
-          </div>
+          </div> */}
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <IconButton
@@ -211,6 +209,10 @@ const LoggedInAppBar = props => {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
+      {/* <MainDrawer
+        isOpen={isMainDrawerOpen}
+        onClose={() => setIsMainDrawerOpen(false)}
+      /> */}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardActions from '@material-ui/core/CardActions';
@@ -32,6 +33,7 @@ const useStyles = makeStyles(theme => ({
   containerContent: {
     width: '100%',
     height: 'auto',
+    flex: '1 0 auto',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -169,37 +171,40 @@ const XertimerMain = ({
         {/* Hero unit */}
         <div className={classes.containerContent}>
           <Container maxWidth='lg'>
-            <Typography
-              component='h3'
-              variant='h3'
-              align='center'
-              color='textPrimary'
-              gutterBottom
-            >
-              {currentUserInfo && `Welcome ${currentUserInfo.displayName}`}
-            </Typography>
-            <Typography
-              variant='h5'
-              align='center'
-              color='textSecondary'
-              paragraph
-            >
-              Begin creating new customized sets for your workouts. You can name
-              and save your sets for future use if desired.
-            </Typography>
-            <div className={classes.heroButtons}>
-              <Grid container spacing={2} justify='center'>
-                <Grid item>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={() => onCreateSetClick()}
-                  >
-                    Create an Exercise
-                  </Button>
+            <Box>
+              <Typography
+                component='h3'
+                variant='h3'
+                align='center'
+                color='textPrimary'
+                gutterBottom
+              >
+                {currentUserInfo && `Welcome ${currentUserInfo.displayName}`}
+              </Typography>
+              <Typography
+                variant='h5'
+                align='center'
+                color='textSecondary'
+                paragraph
+              >
+                Begin creating new customized sets for your workouts. You can
+                name and save your sets for future use if desired.
+              </Typography>
+
+              <div className={classes.heroButtons}>
+                <Grid container spacing={2} justify='center'>
+                  <Grid item>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={() => onCreateSetClick()}
+                    >
+                      Create an Exercise
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </div>
+              </div>
+            </Box>
           </Container>
         </div>
         <Container className={classes.cardGrid} maxWidth='lg'>
