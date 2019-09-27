@@ -37,6 +37,10 @@ const useStyles = makeStyles(theme => ({
     flexGrow: '1',
     padding: 40,
     minHeight: '720px',
+    [theme.breakpoints.down(450)]: {
+      minHeight: '350px',
+      padding: 20,
+    },
   },
   topPanel: {
     display: 'flex',
@@ -48,7 +52,7 @@ const useStyles = makeStyles(theme => ({
     padding: 10,
   },
   timerBox: {
-    width: 600,
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -88,9 +92,9 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     width: 400,
     height: 400,
-    [theme.breakpoints.down(400)]: {
-      width: 350,
-      height: 350,
+    [theme.breakpoints.down(450)]: {
+      width: 300,
+      height: 300,
     },
   },
   buttons: {
@@ -122,8 +126,8 @@ const initState = initialColor => {
     countDownSound: new Audio(beep),
     finalSound: new Audio(chime),
     isVolumeOn: true,
-    currentWidth: window.innerWidth < 400 ? 175 : 200,
-    currentRadius: window.innerWidth < 400 ? 170 : 180,
+    currentWidth: window.innerWidth < 450 ? 150 : 200,
+    currentRadius: window.innerWidth < 450 ? 140 : 180,
   };
 };
 
@@ -263,10 +267,10 @@ const StartWorkout = ({ goBack }) => {
   };
 
   const resize = useCallback(() => {
-    if (window.innerWidth < 400 && state.currentWidth !== 175) {
+    if (window.innerWidth < 450 && state.currentWidth !== 175) {
       dispatch({
         type: 'UPDATE_TIMER_DIMENSIONS',
-        value: { width: 175, radius: 170 },
+        value: { width: 150, radius: 140 },
       });
     } else if (window.innerWidth > 400 && state.currentWidth !== 200) {
       dispatch({
