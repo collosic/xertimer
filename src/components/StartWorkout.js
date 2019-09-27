@@ -38,8 +38,9 @@ const useStyles = makeStyles(theme => ({
     padding: 40,
     minHeight: '720px',
     [theme.breakpoints.down(450)]: {
-      minHeight: '350px',
+      minHeight: '500px',
       padding: 20,
+      justifyContent: 'normal',
     },
   },
   topPanel: {
