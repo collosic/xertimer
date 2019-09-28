@@ -150,7 +150,6 @@ const Login = props => {
   };
 
   const determineIfNewUserandRoute = async results => {
-    debugger;
     const newUser = results.additionalUserInfo.isNewUser;
     if (newUser) {
       const userData = {
