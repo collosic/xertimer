@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   layout: {
     width: '100%',
     height: '100%',
-    [theme.breakpoints.up(400 + theme.spacing(2) * 2)]: {
+    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
       width: 600,
       height: '100%',
       marginLeft: 'auto',
