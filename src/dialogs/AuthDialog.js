@@ -9,13 +9,13 @@ const AuthLogin = ({ fullScreen, onClose }) => {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const openSignUpDialog = (e) => {
+  const openSignUpDialog = e => {
     e.stopPropagation();
     setIsSignUpDialogOpen(true);
     setIsLoginDialogOpen(false);
   };
 
-  const openLoginDialog = (e) => {
+  const openLoginDialog = e => {
     e.stopPropagation();
     setIsLoginDialogOpen(true);
     setIsSignUpDialogOpen(false);
@@ -29,7 +29,7 @@ const AuthLogin = ({ fullScreen, onClose }) => {
     }
   };
 
-  const handleAuthenticating = (performingAuthentication) => {
+  const handleAuthenticating = performingAuthentication => {
     setIsAuthenticating(performingAuthentication);
   };
 
@@ -38,11 +38,12 @@ const AuthLogin = ({ fullScreen, onClose }) => {
       fullScreen={fullScreen}
       open={open}
       onClose={handleClose}
-      aria-labelledby="form-dialog-title"
+      aria-labelledby='form-dialog-title'
+      maxWidth='xs'
     >
       {isSignUpDialogOpen && (
         <React.Fragment>
-          <Hidden only="xs">
+          <Hidden only='xs'>
             <SignUp
               closeDialog={handleClose}
               changeDialog={openLoginDialog}
@@ -60,7 +61,7 @@ const AuthLogin = ({ fullScreen, onClose }) => {
       )}
       {isLoginDialogOpen && (
         <React.Fragment>
-          <Hidden only="xs">
+          <Hidden only='xs'>
             <Login
               closeDialog={handleClose}
               changeDialog={openSignUpDialog}

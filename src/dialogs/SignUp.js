@@ -23,28 +23,40 @@ import Spinner from '../components/Spinner';
 
 const useStyles = makeStyles(theme => ({
   outerContainer: {
-    height: '550px',
-    width: '400px',
+    height: '100%',
+    width: '100%',
     display: 'flex',
     justifyContent: 'center',
+    [theme.breakpoints.up(444)]: {
+      minWidth: '444px',
+    },
   },
   container: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '80%',
   },
   formsContainer: {
     flex: '1 0 auto',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    width: '80%',
   },
   button: {
     margin: theme.spacing(0),
   },
-  title: {},
-  content: {},
+  title: {
+    width: '100%',
+    fontSize: 24,
+    textAlign: 'center',
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
+  },
+  content: {
+    flex: '0 0 auto',
+  },
   dialogActions: {
     width: '100%',
     display: 'flex',
@@ -75,7 +87,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const SignUp = (props) => {
+const SignUp = props => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [values, setValues] = useState({
     name: '',
@@ -88,7 +100,7 @@ const SignUp = (props) => {
 
   const [errors, setErrors] = useState(null);
 
-  const setAuthenticating = (flag) => {
+  const setAuthenticating = flag => {
     setIsAuthenticating(flag);
     props.onAuthenticating(flag);
   };
@@ -138,7 +150,7 @@ const SignUp = (props) => {
     }
   };
 
-  const handleChange = prop => (event) => {
+  const handleChange = prop => event => {
     setValues({ ...values, [prop]: event.target.value });
   };
 
@@ -146,7 +158,7 @@ const SignUp = (props) => {
     setValues({ ...values, [prop]: !values[prop] });
   };
 
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownPassword = event => {
     event.preventDefault();
   };
 
@@ -155,86 +167,104 @@ const SignUp = (props) => {
   return (
     <div className={classes.outerContainer}>
       <div className={classes.container}>
-        <DialogTitle className={classes.title}>Create Xertimer Account</DialogTitle>
+        <DialogTitle className={classes.title}>
+          Create Xertimer Account
+        </DialogTitle>
         <div className={classes.formsContainer}>
           <DialogContent className={classes.content}>
             <form>
               <TextField
-                autoComplete="name"
+                autoComplete='name'
                 error={!!(errors && errors.name)}
                 fullWidth
                 helperText={errors && errors.name ? errors.name[0] : ''}
-                label="Name"
-                margin="normal"
+                label='Name'
+                margin='normal'
                 onChange={handleChange('name')}
-                type="email"
+                type='email'
                 value={values.name}
               />
               <TextField
-                autoComplete="email"
+                autoComplete='email'
                 error={!!(errors && errors.emailAddress)}
                 fullWidth
-                helperText={errors && errors.emailAddress ? errors.emailAddress[0] : ''}
-                label="E-mail address"
-                margin="normal"
+                helperText={
+                  errors && errors.emailAddress ? errors.emailAddress[0] : ''
+                }
+                label='E-mail address'
+                margin='normal'
                 onChange={handleChange('emailAddress')}
-                type="email"
+                type='email'
                 value={values.emailAddress}
               />
               <FormControl
-                margin="normal"
+                margin='normal'
                 fullWidth
                 className={classes.inputFields}
                 error={!!(errors && errors.password)}
               >
-                <InputLabel htmlFor="adornment-password">Password</InputLabel>
+                <InputLabel htmlFor='adornment-password'>Password</InputLabel>
                 <Input
-                  id="adornment-password"
+                  id='adornment-password'
                   type={values.showPassword ? 'text' : 'password'}
                   value={values.password}
                   onChange={handleChange('password')}
-                  endAdornment={(
-                    <InputAdornment position="end">
+                  endAdornment={
+                    <InputAdornment position='end'>
                       <IconButton
-                        aria-label="toggle password visibility"
+                        aria-label='toggle password visibility'
                         onClick={handleClickShowPassword('showPassword')}
                         onMouseDown={handleMouseDownPassword}
                       >
-                        {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                        {values.showPassword ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
                       </IconButton>
                     </InputAdornment>
-)}
+                  }
                 />
-                <FormHelperText id="adornment-password">
+                <FormHelperText id='adornment-password'>
                   {errors && errors.password ? errors.password[0] : ''}
                 </FormHelperText>
               </FormControl>
               <FormControl
                 fullWidth
-                margin="normal"
+                margin='normal'
                 className={classes.inputFields}
                 error={!!(errors && errors.passwordConfirmation)}
               >
-                <InputLabel htmlFor="adornment-passwordConfirmation">Confirm Password</InputLabel>
+                <InputLabel htmlFor='adornment-passwordConfirmation'>
+                  Confirm Password
+                </InputLabel>
                 <Input
-                  id="adornment-passwordConfirmation"
+                  id='adornment-passwordConfirmation'
                   type={values.showPasswordConfirmation ? 'text' : 'password'}
                   value={values.passwordConfirmation}
                   onChange={handleChange('passwordConfirmation')}
-                  endAdornment={(
-                    <InputAdornment position="end">
+                  endAdornment={
+                    <InputAdornment position='end'>
                       <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword('showPasswordConfirmation')}
+                        aria-label='toggle password visibility'
+                        onClick={handleClickShowPassword(
+                          'showPasswordConfirmation',
+                        )}
                         onMouseDown={handleMouseDownPassword}
                       >
-                        {values.showPasswordConfirmation ? <Visibility /> : <VisibilityOff />}
+                        {values.showPasswordConfirmation ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
                       </IconButton>
                     </InputAdornment>
-)}
+                  }
                 />
-                <FormHelperText id="adornment-passwordConfirmation">
-                  {errors && errors.passwordConfirmation ? errors.passwordConfirmation[0] : ''}
+                <FormHelperText id='adornment-passwordConfirmation'>
+                  {errors && errors.passwordConfirmation
+                    ? errors.passwordConfirmation[0]
+                    : ''}
                 </FormHelperText>
               </FormControl>
             </form>
@@ -243,14 +273,14 @@ const SignUp = (props) => {
             <Button
               className={classes.button}
               disabled={
-                !values.name
-                || !values.emailAddress
-                || !values.password
-                || !values.passwordConfirmation
-                || isAuthenticating
+                !values.name ||
+                !values.emailAddress ||
+                !values.password ||
+                !values.passwordConfirmation ||
+                isAuthenticating
               }
-              variant="contained"
-              color="primary"
+              variant='contained'
+              color='primary'
               fullWidth
               onClick={() => signUp()}
             >
@@ -260,8 +290,8 @@ const SignUp = (props) => {
         </div>
         <DialogActions className={classes.createAccountParent}>
           <Button
-            size="small"
-            color="secondary"
+            size='small'
+            color='secondary'
             className={classes.margin}
             onClick={props.changeDialog}
           >

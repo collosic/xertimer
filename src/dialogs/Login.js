@@ -32,27 +32,37 @@ import CustomSnackBar from '../components/CustomSnackBar';
 
 const useStyles = makeStyles(theme => ({
   outerContainer: {
-    height: '550px',
-    width: '400px',
+    height: '100%',
+    width: '100%',
     display: 'flex',
     justifyContent: 'center',
+    [theme.breakpoints.up(444)]: {
+      minWidth: '444px',
+    },
   },
   container: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '80%',
   },
   formsContainer: {
     flex: '1 0 auto',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    width: '80%',
   },
   button: {
     margin: theme.spacing(0),
   },
-  title: {},
+  title: {
+    width: '100%',
+    fontSize: 24,
+    textAlign: 'center',
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
+  },
   content: {
     flex: '0 0 auto',
   },
