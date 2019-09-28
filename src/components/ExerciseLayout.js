@@ -8,6 +8,8 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '@material-ui/core/Icon';
+import uuid from 'uuid';
+
 import ExerciseList from './ExerciseList';
 import CreateSetDialog from '../dialogs/CreateSetDialog';
 import CustomSnackBar from './CustomSnackBar';
@@ -231,16 +233,40 @@ const ExerciseLayout = ({
     const workoutToBeSaved = editingExistingWorkout
       ? generateUpdatedWorkoutObj()
       : generateNewWorkoutObj();
-    // Save workout to Firestore
-    try {
-      await firebase[method](workoutToBeSaved, workoutId);
+    // Determine if user is guest or firebase user
+    if (!firebase.isGuest) {
+      // Save workout to Firestore
+      try {
+        await firebase[method](workoutToBeSaved, workoutId);
+        setSnackBarMsg(
+          `Successfully ${
+            editingExistingWorkout ? 'updated' : 'saved'
+          } workout`,
+        );
+        setLoadWorkouts('LOAD_WORKOUTS');
+      } catch (e) {
+        setSnackBarMsg('Something went wrong with the save');
+        console.log(e);
+      }
+    } else {
+      const workouts = JSON.parse(sessionStorage.getItem('ALL_WORKOUTS'));
+      if (editingExistingWorkout) {
+        workouts.find(workout => {
+          if (workout.id === workoutId) {
+            Object.entries(workoutToBeSaved).forEach(([key, value]) => {
+              workout.workout[key] = workoutToBeSaved[key];
+            });
+          }
+        });
+      } else {
+        workouts.push({ id: uuid.v4(), workout: workoutToBeSaved });
+      }
+
+      sessionStorage.setItem('ALL_WORKOUTS', JSON.stringify(workouts));
       setSnackBarMsg(
         `Successfully ${editingExistingWorkout ? 'updated' : 'saved'} workout`,
       );
       setLoadWorkouts('LOAD_WORKOUTS');
-    } catch (e) {
-      setSnackBarMsg('Something went wrong with the save');
-      console.log(e);
     }
     setIsSaving(false);
     setOpenSnackBar(true);

@@ -177,14 +177,9 @@ const Login = props => {
   }
 
   const signInAnonymously = async () => {
-    // setAuthenticating(true);
-    // try {
-    //   await firebase.signInAnonymously();
-    //   props.history.replace('/Xertimer');
-    // } catch (error) {
-    //   setAuthenticating(false);
-    //   console.log(error);
-    // }
+    setAuthenticating(true);
+    firebase.signInAnonymously();
+    props.history.replace('/Xertimer');
   };
 
   const openSnackBar = () => {

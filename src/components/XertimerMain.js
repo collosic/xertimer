@@ -109,6 +109,11 @@ const XertimerMain = ({
   const [currentCardId, setCurrentCardId] = useState(null);
   const allWorkouts = useContext(AllWorkouts);
 
+  const userMsg =
+    ' You can create and save your workouts for future use if desired.';
+  const guestMsg =
+    ' You can create and save workouts, but once your session is terminated your workouts, as a guest, will not be saved.';
+
   const loadWorkoutsFromFireStore = async () => {
     const workouts = [];
     try {
@@ -129,15 +134,25 @@ const XertimerMain = ({
 
   const deleteWorkout = async () => {
     setIsDeleteDialogOpen(false);
-    try {
-      await firebase.deleteWorkout(currentCardId);
+    if (firebase.isGuest) {
+      const updatedWorkouts = allWorkouts.state.filter(
+        workout => workout.id !== currentCardId,
+      );
+      sessionStorage.setItem('ALL_WORKOUTS', JSON.stringify(updatedWorkouts));
       setSnackBarMsg('Successfully deleted workout');
-      loadWorkoutsFromFireStore();
-      setLoadWorkouts('DO_NOT_LOAD_WORKOUTS');
-    } catch (e) {
-      setSnackBarMsg('An error occured while attempting to delete workout');
-      console.log(e);
+      setLoadWorkouts('LOAD_WORKOUTS');
+    } else {
+      try {
+        await firebase.deleteWorkout(currentCardId);
+        setSnackBarMsg('Successfully deleted workout');
+        loadWorkoutsFromFireStore();
+        setLoadWorkouts('DO_NOT_LOAD_WORKOUTS');
+      } catch (e) {
+        setSnackBarMsg('An error occured while attempting to delete workout');
+        console.log(e);
+      }
     }
+
     openSnackBar(true);
   };
 
@@ -155,14 +170,22 @@ const XertimerMain = ({
       if (!currentUserInfo && user && user.uid) {
         setCurrentUserInfo(user);
       }
-      if (user && loadWorkouts) {
-        loadWorkoutsFromFireStore();
+      if ((user && loadWorkouts) || (firebase.isGuest && loadWorkouts)) {
+        if (firebase.isGuest) {
+          const workouts = JSON.parse(sessionStorage.getItem('ALL_WORKOUTS'));
+          allWorkouts.dispatch({
+            type: 'OVERRIDE',
+            value: workouts,
+          });
+        } else {
+          loadWorkoutsFromFireStore();
+        }
         setLoadWorkouts('DO_NOT_LOAD_WORKOUTS');
       }
     };
 
     initCurrentUser();
-  }, []);
+  }, [loadWorkouts]);
 
   return (
     <>
@@ -179,7 +202,10 @@ const XertimerMain = ({
                 color='textPrimary'
                 gutterBottom
               >
-                {currentUserInfo && `Welcome ${currentUserInfo.displayName}`}
+                {(currentUserInfo || firebase.isGuest) &&
+                  `Welcome ${
+                    firebase.isGuest ? 'Guest' : currentUserInfo.displayName
+                  }`}
               </Typography>
               <Typography
                 variant='h5'
@@ -187,8 +213,8 @@ const XertimerMain = ({
                 color='textSecondary'
                 paragraph
               >
-                Begin creating new customized sets for your workouts. You can
-                name and save your sets for future use if desired.
+                Begin creating new customized sets for your workouts.
+                {firebase.isGuest ? guestMsg : userMsg}
               </Typography>
 
               <div className={classes.heroButtons}>

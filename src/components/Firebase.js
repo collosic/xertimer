@@ -42,6 +42,7 @@ class Firebase {
 
   signInAnonymously() {
     this.isGuest = true;
+    sessionStorage.setItem('ALL_WORKOUTS', JSON.stringify([]));
     return this.isGuest;
   }
 

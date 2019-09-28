@@ -45,6 +45,8 @@ const useStyles = makeStyles(theme => ({
   title: {
     fontSize: 24,
     textAlign: 'center',
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
   },
 }));
 
@@ -263,8 +265,8 @@ const CreateSetDialog = ({ fullScreen, handleClose, isEditModeOn, id }) => {
           onClose={handleClose}
           className={classes.layout}
         >
-          <DialogTitle className={classes.title}>
-            {isEditModeOn ? 'Edit ' : 'Create '}a Set
+          <DialogTitle className={classes.title} color='secondary'>
+            {`${isEditModeOn ? 'Edit ' : 'Create '} a Workout`}
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
             <Grid container spacing={3}>

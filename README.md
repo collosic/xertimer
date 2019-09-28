@@ -26,12 +26,12 @@ Exercise application that allows you to customize timers for workouts. You are g
 1. Add a settings for each user in order to save site settings
 2. Add options for different sounds for the timer
 3. Add a light/dark theme option
+4. Add landscape view
 
 ### Known issues
 
 1. Facebook provider login not functional
-2. Guest log in not functional
-3. SVG circle timer does not function properly in Safari or iOS browsers, the timer works fine though.
+2. SVG circle timer does not function properly in Safari or iOS browsers, the timer works fine though.
 
 ### License
 

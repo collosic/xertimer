@@ -145,7 +145,7 @@ const Xertimer = props => {
   useEffect(() => {
     const getUser = async () => {
       const user = await firebase.getCurrentUser();
-      if (!user) {
+      if (!firebase.isGuest && !user) {
         props.history.replace('/');
       }
     };
